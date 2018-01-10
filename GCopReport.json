@@ -1,0 +1,88 @@
+{
+  "Items": [
+    {
+      "Analyzer": "MeaningfulNameForVariablesAnalyzer",
+      "OccurrenceCount": 32,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "UseUsingsOnIDisposableAnalyzer",
+      "OccurrenceCount": 1876,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "LongMethodAnalyzer",
+      "OccurrenceCount": 2,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "ConstantVariableAnalyzer",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "FloatVariablesComparisonAnalyser",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "IEnumerableMultipleEvaluationsAnalyzer",
+      "OccurrenceCount": 6,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "PropertyToExpressionAnalyzer",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "AsyncAwaitMethodAnalyzer",
+      "OccurrenceCount": 23,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "RedundantDatabaseGetAnalyzer",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "RemoveUnnecessaryBracesAnalyzer",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "UnusedMethodsAnalyzer",
+      "OccurrenceCount": 22,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    },
+    {
+      "Analyzer": "UseStringCollectionIntersectsAnalyzer",
+      "OccurrenceCount": 1,
+      "Exceptions": null,
+      "SentToServer": true,
+      "InstallationName": "DESKTOP-LLCTIMB"
+    }
+  ]
+}
