@@ -1,8 +1,6 @@
 ﻿namespace Zebble
 {
-    using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     public static partial class LocalNotification
     {

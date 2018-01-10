@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>Zebble.HelpOverlay</id>
-    <version>1.0.0</version>
-    <title>HelpOverlay for Zebble (Xamarin)</title>
-    <projectUrl>https://github.com/Geeksltd/Zebble.HelpOverlay</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/Geeksltd/Zebble.HelpOverlay/master/Shared/NuGet/Icon.png</iconUrl>
-    <copyright>Copyright ©2017 Geeks Ltd - All rights reserved.</copyright>
-    <description>. . .</description>
+    <id>Zebble.LocalNotification</id>
+    <version>1.0.100</version>
+    <title>Local notification implementation for Zebble (Xamarin)</title>
+    <projectUrl>https://github.com/Geeksltd/Zebble.LocalNotification</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Geeksltd/Zebble.LocalNotification/master/Shared/NuGet/Icon.png</iconUrl>
+    <copyright>Copyright ©2018 Geeks Ltd - All rights reserved.</copyright>
+    <description>Local notification implementation for Zebble for Xamarin</description>
     <authors>Geeks Ltd</authors>
+    <owners>Geeks Ltd</owners>
     <dependencies>
-      <!-- <dependency id="Zebble....." version="..." />  -->
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\lib\Zebble.HelpOverlay.iOS.*" target="lib\Xamarin.iOS10\" />
-    <file src="..\..\lib\Zebble.HelpOverlay.Android.*" target="lib\MonoAndroid10\" />
-    <file src="..\..\lib\Zebble.HelpOverlay.UWP.*" target="lib\UAP10\" />
+    <file src="..\..\lib\Zebble.LocalNotification.iOS.*" target="lib\Xamarin.iOS10\" />
+    <file src="..\..\lib\Zebble.LocalNotification.Android.*" target="lib\MonoAndroid10\" />
+    <file src="..\..\lib\Zebble.LocalNotification.UWP.*" target="lib\UAP10\" />
   </files>
 </package>

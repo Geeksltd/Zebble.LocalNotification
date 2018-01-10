@@ -1,9 +1,5 @@
 ﻿namespace Zebble
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Windows.Data.Xml.Dom;
     using Windows.UI.Notifications;
 
@@ -64,9 +60,6 @@
             return Task.CompletedTask;
         }
 
-        public static Task Initialize()
-        {
-            return Task.CompletedTask;
-        }
+        public static Task Initialize() => Task.CompletedTask;
     }
 }

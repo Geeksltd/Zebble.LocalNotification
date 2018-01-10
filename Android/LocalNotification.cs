@@ -1,12 +1,12 @@
 ﻿namespace Zebble
 {
+    using Android.App;
+    using Android.Content;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using System.Xml.Serialization;
-    using Android.App;
-    using Android.Content;
 
     public static partial class LocalNotification
     {

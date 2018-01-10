@@ -1,11 +1,11 @@
 ﻿namespace Zebble
 {
+    using Foundation;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Foundation;
-    using UIKit;
     using System.Threading.Tasks;
+    using UIKit;
     using UserNotifications;
 
     public static partial class LocalNotification
@@ -98,7 +98,6 @@
 
             return Task.CompletedTask;
         }
-
 
         static void ShowUserNotification(string title, string body, int id, UNNotificationTrigger trigger)
         {
