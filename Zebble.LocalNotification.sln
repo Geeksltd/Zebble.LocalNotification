@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Android", "Android\Android.csproj", "{CC23F9F8-AE12-4CCF-8404-49893B6D565C}"
 EndProject
@@ -12,11 +11,11 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{F413D304-3B87-4DB8-90D1-84694155ECA5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB802F83-E581-4C4B-9B16-7D00D66C9329}"
-ProjectSection(SolutionItems) = preProject
-GCop.json = GCop.json
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		GCop.json = GCop.json
+		README.md = README.md
+	EndProjectSection
 EndProject
-
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Shared\Shared.projitems*{aeff27a1-7ff0-4803-8afc-bdee2a526f17}*SharedItemsImports = 4
@@ -86,5 +85,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6439B2A-D4D6-4D1C-9E35-21BB124FBFC6}
 	EndGlobalSection
 EndGlobal
