@@ -1,4 +1,4 @@
-﻿namespace Zebble
+﻿namespace Zebble.Device
 {
     using System;
     using System.Linq;

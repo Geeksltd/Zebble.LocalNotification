@@ -1,4 +1,4 @@
-﻿namespace Zebble
+﻿namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;

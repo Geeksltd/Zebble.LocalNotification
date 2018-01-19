@@ -1,4 +1,4 @@
-﻿namespace Zebble
+﻿namespace Zebble.Device
 {
     using Foundation;
     using System;
@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using UIKit;
     using UserNotifications;
+    using Zebble.Device;
 
     public static partial class LocalNotification
     {
@@ -16,7 +17,7 @@
         {
             try
             {
-                if (!await DevicePermission.LocalNotification.IsGranted())
+                if (!await Permission.LocalNotification.IsGranted())
                 {
                     await Alert.Show("Permission was not granted to show local notifications.");
                     return false;
@@ -39,7 +40,7 @@
 
         public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id)
         {
-            if (!await DevicePermission.LocalNotification.IsGranted())
+            if (!await Permission.LocalNotification.IsGranted())
             {
                 await Alert.Show("Permission was not granted to show local notifications.");
                 return false;
