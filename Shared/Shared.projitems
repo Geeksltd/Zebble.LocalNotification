@@ -17,5 +17,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)LocalNotification.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NotificationMessage.cs" />
   </ItemGroup>
 </Project>
