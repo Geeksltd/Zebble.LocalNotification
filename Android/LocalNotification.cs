@@ -1,4 +1,6 @@
-﻿namespace Zebble.Device
+﻿using Android.Media;
+
+namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
@@ -21,7 +23,7 @@
             return PendingIntent.GetBroadcast(Application.Context, 0, intent, PendingIntentFlags.CancelCurrent);
         }
 
-        public static Task<bool> Show(string title, string body)
+        public static Task<bool> Show(string title, string body, bool playSound = false)
         {
             var builder = new Notification.Builder(Application.Context)
                 .SetContentTitle(title)
@@ -29,6 +31,10 @@
                 .SetAutoCancel(autoCancel: true)
                 .SetSmallIcon(UIRuntime.NotificationSmallIcon)
                 .SetLargeIcon(UIRuntime.NotificationLargeIcon);
+
+            if (playSound)
+                builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
+
 
             if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
 
@@ -44,10 +50,11 @@
             builder.SetContentIntent(resultPendingIntent);
             NotificationManager.Notify(0, builder.Build());
 
+
             return Task.FromResult(result: true);
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false)
         {
             var intent = CreateIntent(id);
 
@@ -57,7 +64,8 @@
                 Body = body,
                 Id = id,
                 IconId = UIRuntime.NotificationSmallIcon,
-                NotifyTime = notifyTime
+                NotifyTime = notifyTime,
+                PlaySound = playSound
             };
 
             if (NotificationIconId != 0) localNotification.IconId = NotificationIconId;

@@ -13,7 +13,7 @@
     {
         const string NOTIFICATION_KEY = "LocalNotificationKey";
 
-        public async static Task<bool> Show(string title, string body)
+        public async static Task<bool> Show(string title, string body, bool playSound = false)
         {
             try
             {
@@ -26,7 +26,7 @@
                 if (Device.OS.IsAtLeastiOS(10))
                 {
                     var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(.1, repeats: false);
-                    ShowUserNotification(title, body, 0, trigger);
+                    ShowUserNotification(title, body, 0, trigger, playSound);
                     return true;
                 }
                 else return await Schedule(title, body, DateTime.Now, 0);
@@ -38,7 +38,7 @@
             }
         }
 
-        public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id)
+        public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false)
         {
             if (!await Permission.LocalNotification.IsGranted())
             {
@@ -50,7 +50,7 @@
             {
                 var trigger = UNCalendarNotificationTrigger.CreateTrigger(GetNSDateComponentsFromDateTime(notifyTime), repeats: false);
 
-                ShowUserNotification(title, body, id, trigger);
+                ShowUserNotification(title, body, id, trigger, playSound);
             }
             else
             {
@@ -100,11 +100,13 @@
             return Task.CompletedTask;
         }
 
-        static void ShowUserNotification(string title, string body, int id, UNNotificationTrigger trigger)
+        static void ShowUserNotification(string title, string body, int id, UNNotificationTrigger trigger, bool playSound = false)
         {
             if (Device.OS.IsBeforeiOS(10)) return;
 
             var content = new UNMutableNotificationContent() { Title = title, Body = body };
+
+            content.Sound = UNNotificationSound.Default;
 
             var request = UNNotificationRequest.FromIdentifier(id.ToString(), content, trigger);
 

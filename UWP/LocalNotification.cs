@@ -15,11 +15,12 @@
                                                   + "<text id='2'>{1}</text>"
                                                   + "</binding>"
                                                   + "</visual>"
+                                                  + "{2}"
                                                   + "</toast>";
 
-        public static Task<bool> Show(string title, string body)
+        public static Task<bool> Show(string title, string body, bool playSound = false)
         {
-            var xmlData = string.Format(TOAST_TEMPLATE, title, body);
+            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlData);
@@ -28,14 +29,15 @@
 
             var manager = ToastNotificationManager.CreateToastNotifier();
 
+
             manager.Show(toast);
 
             return Task.FromResult(result: true);
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false)
         {
-            var xmlData = string.Format(TOAST_TEMPLATE, title, body);
+            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlData);

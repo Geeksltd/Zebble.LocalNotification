@@ -1,4 +1,6 @@
-﻿namespace Zebble.Device
+﻿using Android.Media;
+
+namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
@@ -20,6 +22,9 @@
                 .SetContentText(notification.Body)
                 .SetSmallIcon(notification.IconId)
                 .SetAutoCancel(autoCancel: true);
+
+            if (notification.PlaySound)
+                builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
 
             var resultIntent = UIRuntime.LauncherActivity;
             resultIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask);

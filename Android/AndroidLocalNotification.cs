@@ -9,5 +9,6 @@
         public int Id { get; set; }
         public int IconId { get; set; }
         public DateTime NotifyTime { get; set; }
+        public bool PlaySound { set; get; }
     }
 }
