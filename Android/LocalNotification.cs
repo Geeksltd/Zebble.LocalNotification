@@ -4,6 +4,7 @@ namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
+    using Android.OS;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -13,6 +14,8 @@ namespace Zebble.Device
     public static partial class LocalNotification
     {
         public static int NotificationIconId { get; set; }
+
+        public static string ChannelId { get; internal set; }
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
 
@@ -31,6 +34,8 @@ namespace Zebble.Device
                 .SetAutoCancel(autoCancel: true)
                 .SetSmallIcon(UIRuntime.NotificationSmallIcon)
                 .SetLargeIcon(UIRuntime.NotificationLargeIcon);
+
+            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O) builder.SetChannelId(ChannelId);
 
             if (playSound)
                 builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
@@ -96,6 +101,13 @@ namespace Zebble.Device
             {
                 var parameters = extras.GetBundle("LocalNotification");
                 Tapped?.Raise(parameters.ToArray<KeyValuePair<string, string>>());
+            }
+
+            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O)
+            {
+                ChannelId = UIRuntime.CurrentActivity.ApplicationContext.PackageName;
+                var channel = new NotificationChannel(ChannelId, UIRuntime.CurrentActivity.ApplicationContext.ApplicationInfo.Name, NotificationImportance.Default);
+                NotificationManager.CreateNotificationChannel(channel);
             }
 
             return Task.CompletedTask;

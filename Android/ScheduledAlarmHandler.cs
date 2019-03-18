@@ -4,6 +4,7 @@ namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
+    using Android.OS;
     using System.IO;
     using System.Xml.Serialization;
 
@@ -22,6 +23,8 @@ namespace Zebble.Device
                 .SetContentText(notification.Body)
                 .SetSmallIcon(notification.IconId)
                 .SetAutoCancel(autoCancel: true);
+
+            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O) builder.SetChannelId(LocalNotification.ChannelId);
 
             if (notification.PlaySound)
                 builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
