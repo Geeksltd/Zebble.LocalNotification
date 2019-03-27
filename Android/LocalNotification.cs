@@ -1,9 +1,8 @@
-﻿using Android.Media;
-
-namespace Zebble.Device
+﻿namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
+    using Android.Media;
     using Android.OS;
     using System;
     using System.Collections.Generic;
@@ -21,11 +20,6 @@ namespace Zebble.Device
 
         static AlarmManager AlarmManager => UIRuntime.GetService<AlarmManager>(Context.AlarmService);
 
-        static PendingIntent ToPendingBroadcast(Intent intent)
-        {
-            return PendingIntent.GetBroadcast(Application.Context, 0, intent, PendingIntentFlags.CancelCurrent);
-        }
-
         public static Task<bool> Show(string title, string body, bool playSound = false)
         {
             var builder = new Notification.Builder(Application.Context)
@@ -35,7 +29,7 @@ namespace Zebble.Device
                 .SetSmallIcon(UIRuntime.NotificationSmallIcon)
                 .SetLargeIcon(UIRuntime.NotificationLargeIcon);
 
-            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O) builder.SetChannelId(ChannelId);
+            if (OS.IsAtLeast(BuildVersionCodes.O)) builder.SetChannelId(ChannelId);
 
             if (playSound)
                 builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
@@ -43,18 +37,13 @@ namespace Zebble.Device
 
             if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
 
-            // Add parameters
-            var bundle = new Android.OS.Bundle();
-
+            // Add parameters 
             var resultIntent = UIRuntime.LauncherActivity;
             resultIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask | ActivityFlags.ClearTop);
-            resultIntent.PutExtra("LocalNotification", bundle);
+            resultIntent.PutExtra("LocalNotification", new Bundle());
 
-            var resultPendingIntent = PendingIntent.GetActivity(Application.Context, 0, resultIntent, PendingIntentFlags.UpdateCurrent);
-
-            builder.SetContentIntent(resultPendingIntent);
+            builder.SetContentIntent(resultIntent.ToPendingBroadcast());
             NotificationManager.Notify(0, builder.Build());
-
 
             return Task.FromResult(result: true);
         }
@@ -80,14 +69,14 @@ namespace Zebble.Device
 
             AlarmManager.Set(AlarmType.RtcWakeup,
                triggerAtMillis: localNotification.NotifyTime.ToUnixEpoch(),
-               operation: ToPendingBroadcast(intent));
+               operation: intent.ToPendingBroadcast());
 
             return Task.FromResult(result: true);
         }
 
         public static Task Cancel(int id)
         {
-            AlarmManager.Cancel(ToPendingBroadcast(CreateIntent(id)));
+            AlarmManager.Cancel(CreateIntent(id).ToPendingBroadcast());
             NotificationManager.Cancel(id);
 
             return Task.CompletedTask;
@@ -103,7 +92,7 @@ namespace Zebble.Device
                 Tapped?.Raise(parameters.ToArray<KeyValuePair<string, string>>());
             }
 
-            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O)
+            if (OS.IsAtLeast(BuildVersionCodes.O))
             {
                 ChannelId = UIRuntime.CurrentActivity.ApplicationContext.PackageName;
                 var channel = new NotificationChannel(ChannelId, UIRuntime.CurrentActivity.ApplicationContext.ApplicationInfo.Name, NotificationImportance.Default);

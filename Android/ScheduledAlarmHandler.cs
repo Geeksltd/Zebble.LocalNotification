@@ -24,7 +24,7 @@ namespace Zebble.Device
                 .SetSmallIcon(notification.IconId)
                 .SetAutoCancel(autoCancel: true);
 
-            if (Build.VERSION.SdkInt >= Build.VERSION_CODES.O) builder.SetChannelId(LocalNotification.ChannelId);
+            if (OS.IsAtLeast(BuildVersionCodes.O)) builder.SetChannelId(LocalNotification.ChannelId);
 
             if (notification.PlaySound)
                 builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
