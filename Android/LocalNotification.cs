@@ -5,16 +5,16 @@
     using Android.Media;
     using Android.OS;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using System.Xml.Serialization;
+    using System.Collections.Generic;
 
     public static partial class LocalNotification
     {
         public static int NotificationIconId { get; set; }
 
-        public static string ChannelId { get; internal set; }
+        public static ScheduledAlarmHandler ReceiverInstance;
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
 
@@ -29,11 +29,16 @@
                 .SetSmallIcon(UIRuntime.NotificationSmallIcon)
                 .SetLargeIcon(UIRuntime.NotificationLargeIcon);
 
-            if (OS.IsAtLeast(BuildVersionCodes.O)) builder.SetChannelId(ChannelId);
+            if (OS.IsAtLeast(BuildVersionCodes.O))
+            {
+                var channelId = Guid.NewGuid().ToString();
+                var channel = new NotificationChannel(channelId, "app_channel_name", NotificationImportance.Default);
+                NotificationManager.CreateNotificationChannel(channel);
 
-            if (playSound)
-                builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
+                builder.SetChannelId(channelId);
+            }
 
+            if (playSound) builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
 
             if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
 
@@ -94,12 +99,31 @@
 
             if (OS.IsAtLeast(BuildVersionCodes.O))
             {
-                ChannelId = UIRuntime.CurrentActivity.ApplicationContext.PackageName;
-                var channel = new NotificationChannel(ChannelId, UIRuntime.CurrentActivity.ApplicationContext.ApplicationInfo.Name, NotificationImportance.Default);
-                NotificationManager.CreateNotificationChannel(channel);
+                var serviceIntent = new Intent(UIRuntime.CurrentActivity, typeof(ScheduledAlarmService));
+                UIRuntime.CurrentActivity.StartService(serviceIntent);
+            }
+            else
+            {
+                var intentFilter = new IntentFilter();
+                intentFilter.AddAction("android.intent.action.SCREEN_ON");
+                intentFilter.AddAction("android.intent.action.SCREEN_OFF");
+                intentFilter.AddAction("android.intent.action.BOOT_COMPLETED");
+
+                intentFilter.Priority = 100;
+
+                ReceiverInstance = new ScheduledAlarmHandler();
+                UIRuntime.CurrentActivity.RegisterReceiver(ReceiverInstance, intentFilter);
             }
 
             return Task.CompletedTask;
+        }
+
+        public static void Destroy()
+        {
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O) return;
+
+            if (ReceiverInstance != null)
+                UIRuntime.CurrentActivity.UnregisterReceiver(ReceiverInstance);
         }
 
         static Intent CreateIntent(int id)
