@@ -20,6 +20,8 @@ namespace Zebble.Device
             var extra = intent.GetStringExtra(LocalNotificationKey);
             var notification = DeserializeNotification(extra);
 
+            if (notification == null) return;
+
             var builder = new Notification.Builder(context)
                 .SetContentTitle(notification.Title)
                 .SetContentText(notification.Body)
