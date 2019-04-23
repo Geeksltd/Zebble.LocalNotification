@@ -16,7 +16,7 @@
     <None Include="$(MSBuildThisFileDirectory)NuGet\Icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)LocalNotification.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)NotificationMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LocalNotificationExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Notification.cs" />
   </ItemGroup>
 </Project>

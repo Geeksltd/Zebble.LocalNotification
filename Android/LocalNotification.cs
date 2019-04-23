@@ -4,73 +4,62 @@
     using Android.Content;
     using Android.Media;
     using Android.OS;
+    using Newtonsoft.Json;
     using System;
-    using System.IO;
-    using System.Threading.Tasks;
-    using System.Xml.Serialization;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     public static partial class LocalNotification
     {
-        public static int NotificationIconId { get; set; }
+        internal const string LocalNotificationKey = "LocalNotification";
+        internal static ScheduledAlarmHandler ReceiverInstance;
 
-        public static ScheduledAlarmHandler ReceiverInstance;
+        internal static int NotificationIconId { get; set; }
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
 
         static AlarmManager AlarmManager => UIRuntime.GetService<AlarmManager>(Context.AlarmService);
 
-        public static Task<bool> Show(string title, string body, bool playSound = false)
+        static int GetUniqueId => (int)Java.Lang.JavaSystem.CurrentTimeMillis() & 0xffffff;
+
+        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var builder = new Notification.Builder(Application.Context)
-                .SetContentTitle(title)
-                .SetContentText(body)
-                .SetAutoCancel(autoCancel: true)
-                .SetSmallIcon(UIRuntime.NotificationSmallIcon)
-                .SetLargeIcon(UIRuntime.NotificationLargeIcon);
-
-            if (OS.IsAtLeast(BuildVersionCodes.O))
+            await CreateNotification(new AndroidLocalNotification
             {
-                var channelId = Guid.NewGuid().ToString();
-                var channel = new NotificationChannel(channelId, "app_channel_name", NotificationImportance.Default);
-                NotificationManager.CreateNotificationChannel(channel);
-
-                builder.SetChannelId(channelId);
-            }
-
-            if (playSound) builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
-
-            if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
-
-            // Add parameters 
-            var resultIntent = UIRuntime.LauncherActivity;
-            resultIntent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask | ActivityFlags.ClearTop);
-            resultIntent.PutExtra("LocalNotification", new Bundle());
-
-            builder.SetContentIntent(resultIntent.ToPendingBroadcast());
-            NotificationManager.Notify(0, builder.Build());
-
-            return Task.FromResult(result: true);
+                Title = title,
+                Body = body,
+                PlaySound = playSound,
+                Id = 0,
+                IntentId = GetUniqueId,
+                IconId = UIRuntime.NotificationSmallIcon,
+                NotifyTime = DateTime.Now,
+                Parameters = parameters.DicToString()
+            });
+            return true;
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             var intent = CreateIntent(id);
+            var packageName = UIRuntime.CurrentActivity.ApplicationContext.PackageName;
 
             var localNotification = new AndroidLocalNotification
             {
                 Title = title,
                 Body = body,
                 Id = id,
+                IntentId = GetUniqueId,
                 IconId = UIRuntime.NotificationSmallIcon,
                 NotifyTime = notifyTime,
-                PlaySound = playSound
+                PlaySound = playSound,
+                Parameters = parameters.DicToString()
             };
 
             if (NotificationIconId != 0) localNotification.IconId = NotificationIconId;
 
-            var serializedNotification = SerializeNotification(localNotification);
-            intent.PutExtra(ScheduledAlarmHandler.LocalNotificationKey, serializedNotification);
+            var serializedNotification = JsonConvert.SerializeObject(localNotification);
+            intent.PutExtra(LocalNotificationKey, serializedNotification);
 
             AlarmManager.Set(AlarmType.RtcWakeup,
                triggerAtMillis: localNotification.NotifyTime.ToUnixEpoch(),
@@ -87,33 +76,23 @@
             return Task.CompletedTask;
         }
 
-        public static Task Initialize(Intent intent)
+        public static Task Initialize(Intent intent, Action<Notification> OnTapped = null)
         {
-            var extras = intent.Extras;
+            UIRuntime.OnNewIntent.Handle(async mainIntent =>
+             {
+                 await OnNotificationTapped(intent, OnTapped);
 
-            if (extras?.ContainsKey("LocalNotification") == true)
-            {
-                var parameters = extras.GetBundle("LocalNotification");
-                Tapped?.Raise(parameters.ToArray<KeyValuePair<string, string>>());
-            }
-
-            if (OS.IsAtLeast(BuildVersionCodes.O))
-            {
-                var serviceIntent = new Intent(UIRuntime.CurrentActivity, typeof(ScheduledAlarmService));
-                UIRuntime.CurrentActivity.StartService(serviceIntent);
-            }
-            else
-            {
-                var intentFilter = new IntentFilter();
-                intentFilter.AddAction("android.intent.action.SCREEN_ON");
-                intentFilter.AddAction("android.intent.action.SCREEN_OFF");
-                intentFilter.AddAction("android.intent.action.BOOT_COMPLETED");
-
-                intentFilter.Priority = 100;
-
-                ReceiverInstance = new ScheduledAlarmHandler();
-                UIRuntime.CurrentActivity.RegisterReceiver(ReceiverInstance, intentFilter);
-            }
+                 if (OS.IsAtLeast(BuildVersionCodes.O))
+                 {
+                     var serviceIntent = new Intent(UIRuntime.CurrentActivity, typeof(ScheduledAlarmService));
+                     UIRuntime.CurrentActivity.StartService(serviceIntent);
+                 }
+                 else
+                 {
+                     var intentFilter = await SetActionFilters();
+                     UIRuntime.CurrentActivity.RegisterReceiver(ReceiverInstance, intentFilter);
+                 }
+             });
 
             return Task.CompletedTask;
         }
@@ -126,20 +105,79 @@
                 UIRuntime.CurrentActivity.UnregisterReceiver(ReceiverInstance);
         }
 
+        internal static Task<IntentFilter> SetActionFilters()
+        {
+            var intentFilter = new IntentFilter();
+            intentFilter.AddAction("android.intent.action.SCREEN_ON");
+            intentFilter.AddAction("android.intent.action.SCREEN_OFF");
+            intentFilter.AddAction("android.intent.action.BOOT_COMPLETED");
+
+            intentFilter.Priority = 100;
+
+            ReceiverInstance = new ScheduledAlarmHandler();
+
+            return Task.FromResult(intentFilter);
+        }
+
+        internal static Task CreateNotification(AndroidLocalNotification notification, Context context = null)
+        {
+            var currentcontext = context ?? UIRuntime.CurrentActivity;
+
+            var builder = new Android.App.Notification.Builder(Application.Context)
+                .SetContentTitle(notification.Title)
+                .SetContentText(notification.Body)
+                .SetAutoCancel(autoCancel: true)
+                .SetSmallIcon(notification.IconId);
+
+            if (OS.IsAtLeast(BuildVersionCodes.O))
+            {
+                var channelId = Guid.NewGuid().ToString();
+                var channel = new NotificationChannel(channelId, "app_channel_name", NotificationImportance.Default);
+                NotificationManager.CreateNotificationChannel(channel);
+
+                builder.SetChannelId(channelId);
+            }
+
+            if (notification.PlaySound) builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
+
+            if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
+
+            var resultIntent = UIRuntime.LauncherActivity;
+            resultIntent.PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
+            var resultPendingIntent = PendingIntent.GetActivity(currentcontext, notification.IntentId, resultIntent, PendingIntentFlags.UpdateCurrent);
+
+            builder.SetContentIntent(resultPendingIntent);
+            NotificationManager.Notify(notification.Id, builder.Build());
+
+            return Task.CompletedTask;
+        }
+
+        async static Task OnNotificationTapped(Intent intent, Action<Notification> OnTapped = null)
+        {
+            if (OnTapped == null) return;
+
+            var extra = intent.GetStringExtra(LocalNotificationKey);
+            if (string.IsNullOrEmpty(extra))
+            {
+                var launcherIntentData = UIRuntime.LauncherActivity.GetStringExtra(LocalNotificationKey);
+                if (string.IsNullOrEmpty(launcherIntentData)) return;
+            }
+
+            var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
+            OnTapped.Invoke(new Notification
+            {
+                Title = notification.Title,
+                Body = notification.Body,
+                Id = notification.Id,
+                NotifyTime = notification.NotifyTime,
+                Parameters = notification.Parameters.StringToDic()
+            });
+        }
+
         static Intent CreateIntent(int id)
         {
             return new Intent(Application.Context, typeof(ScheduledAlarmHandler))
                 .SetAction("LocalNotifierIntent" + id);
-        }
-
-        static string SerializeNotification(AndroidLocalNotification notification)
-        {
-            var xmlSerializer = new XmlSerializer(notification.GetType());
-            using (var writer = new StringWriter())
-            {
-                xmlSerializer.Serialize(writer, notification);
-                return writer.ToString();
-            }
         }
     }
 }
