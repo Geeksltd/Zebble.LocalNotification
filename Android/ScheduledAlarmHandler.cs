@@ -4,6 +4,7 @@
     using Android.Content;
     using Android.OS;
     using Newtonsoft.Json;
+    using System;
 
     [BroadcastReceiver(Enabled = true, Label = "Local Notifications Plugin Broadcast Receiver")]
     public class ScheduledAlarmHandler : BroadcastReceiver
@@ -11,11 +12,18 @@
         public override void OnReceive(Context context, Intent intent)
         {
             var extra = intent.GetStringExtra(LocalNotification.LocalNotificationKey);
-            var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
+            if (extra.LacksValue()) return;
 
-            if (notification == null) return;
-
-            LocalNotification.CreateNotification(notification, context);
+            try
+            {
+                var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
+                if (notification != null)
+                    LocalNotification.CreateNotification(notification, context);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+            }
         }
     }
 

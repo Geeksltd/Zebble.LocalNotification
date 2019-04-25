@@ -157,10 +157,10 @@
             if (OnTapped == null) return;
 
             var extra = intent.GetStringExtra(LocalNotificationKey);
-            if (string.IsNullOrEmpty(extra))
+            if (extra.LacksValue())
             {
                 var launcherIntentData = UIRuntime.LauncherActivity.GetStringExtra(LocalNotificationKey);
-                if (string.IsNullOrEmpty(launcherIntentData)) return;
+                if (launcherIntentData.LacksValue()) return;
             }
 
             var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
