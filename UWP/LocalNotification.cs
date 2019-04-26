@@ -1,6 +1,7 @@
 ﻿namespace Zebble.Device
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Windows.Data.Xml.Dom;
@@ -8,7 +9,12 @@
 
     public static partial class LocalNotification
     {
-        const string TOAST_TEMPLATE = "<toast>"
+        const string TITLE_KEY = "TitleKey";
+        const string BODY_KEY = "BodyKey";
+        const string ID_KEY = "IdKey";
+        const string DATETIME_KEY = "DateTimeKey";
+        const string FMT = "O";
+        const string TOAST_TEMPLATE = "<toast {3}>"
                                                   + "<visual>"
                                                   + "<binding template='ToastText02'>"
                                                   + "<text id='1'>{0}</text>"
@@ -18,9 +24,30 @@
                                                   + "{2}"
                                                   + "</toast>";
 
-        public static Task<bool> Show(string title, string body, bool playSound = false)
+        static string GetParameters(string title, string body, int id, DateTime notifyDateTime, Dictionary<string, string> parameters)
         {
-            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty);
+            void setDetail()
+            {
+                parameters.Add(TITLE_KEY, title);
+                parameters.Add(BODY_KEY, body);
+                parameters.Add(ID_KEY, id.ToString());
+                parameters.Add(DATETIME_KEY, notifyDateTime.ToString(FMT));
+            }
+
+            if (parameters != null) setDetail();
+            else
+            {
+                parameters = new Dictionary<string, string>();
+                setDetail();
+            }
+
+            return $"launch=\"{parameters.DicToString()}\"";
+        }
+
+        public static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        {
+            var param = GetParameters(title, body, 0, DateTime.Now, parameters);
+            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlData);
@@ -29,15 +56,15 @@
 
             var manager = ToastNotificationManager.CreateToastNotifier();
 
-
             manager.Show(toast);
 
             return Task.FromResult(result: true);
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty);
+            var param = GetParameters(title, body, id, notifyTime, parameters);
+            var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlData);
@@ -46,25 +73,43 @@
               ? DateTime.Now.AddMilliseconds(100)
               : notifyTime;
 
-            var scheduledTileNotification = new ScheduledTileNotification(xmlDoc, correctedTime) { Id = id.ToString() };
+            var scheduledToastNotification = new ScheduledToastNotification(xmlDoc, new DateTimeOffset(correctedTime)) { Id = id.ToString() };
 
-            TileUpdateManager.CreateTileUpdaterForApplication().AddToSchedule(scheduledTileNotification);
+            ToastNotificationManager.CreateToastNotifier().AddToSchedule(scheduledToastNotification);
 
             return Task.FromResult(result: true);
         }
 
         public static Task Cancel(int id)
         {
-            var scheduledNotifications = TileUpdateManager.CreateTileUpdaterForApplication().GetScheduledTileNotifications();
+            var scheduledNotifications = ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications();
             var notification =
                 scheduledNotifications.FirstOrDefault(n => n.Id.Equals(id.ToString(), StringComparison.OrdinalIgnoreCase));
 
             if (notification != null)
-                TileUpdateManager.CreateTileUpdaterForApplication().RemoveFromSchedule(notification);
+                ToastNotificationManager.CreateToastNotifier().RemoveFromSchedule(notification);
 
             return Task.CompletedTask;
         }
 
-        public static Task Initialize() => Task.CompletedTask;
+        public static Task Initialize(Action<Notification> onTapped)
+        {
+            if (onTapped == null) return Task.CompletedTask;
+
+            UIRuntime.OnParameterRecieved.Handle(args =>
+            {
+                onTapped.Invoke(new Notification
+                {
+                    Title = args[TITLE_KEY],
+                    Body = args[BODY_KEY],
+                    Id = Convert.ToInt32(args[ID_KEY]),
+                    NotifyTime = DateTime.ParseExact(args[DATETIME_KEY], FMT, System.Globalization.CultureInfo.InvariantCulture),
+                    Parameters = args.Except(x => x.Key == TITLE_KEY || x.Key == BODY_KEY || x.Key == ID_KEY || x.Key == DATETIME_KEY)
+                    .ToDictionary(x => x.Key, x => x.Value)
+                });
+            });
+
+            return Task.CompletedTask;
+        }
     }
 }
