@@ -4,6 +4,7 @@
     using Android.Content;
     using Android.Media;
     using Android.OS;
+    using Java.Lang;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
@@ -102,7 +103,16 @@
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O) return;
 
             if (ReceiverInstance != null)
-                UIRuntime.CurrentActivity.UnregisterReceiver(ReceiverInstance);
+            {
+                try
+                {
+                    UIRuntime.CurrentActivity.UnregisterReceiver(ReceiverInstance);
+                }
+                catch (IllegalArgumentException)
+                {
+                    // Receiver not registered.
+                }
+            }
         }
 
         internal static Task<IntentFilter> SetActionFilters()
