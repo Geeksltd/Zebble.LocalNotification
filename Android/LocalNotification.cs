@@ -17,6 +17,8 @@
         internal const string LocalNotificationKey = "LocalNotification";
         internal static ScheduledAlarmHandler ReceiverInstance;
         public static int IconResourceId = Android.Resource.Drawable.IcNotificationOverlay;
+        public static int TransParentIconResourceId = Android.Resource.Drawable.IcNotificationOverlay;
+        public static Color TransparentIconColor = Colors.White;
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
 
@@ -41,6 +43,8 @@
                 Id = id,
                 IntentId = GetUniqueId,
                 IconId = IconResourceId,
+                TransparentIconId = TransParentIconResourceId,
+                TransparentIconColor = TransparentIconColor,
                 NotifyTime = DateTime.Now,
                 Parameters = parameters.DicToString()
             };
@@ -101,9 +105,11 @@
             return Task.FromResult(intentFilter);
         }
 
-        public static void Configure(string name, string description, int iconResourceId, bool sound, NotificationImportance importance = NotificationImportance.High)
+        public static void Configure(string name, string description, int iconResourceId,int transparentIconResourceId,Color transparentIconColor, bool sound, NotificationImportance importance = NotificationImportance.High)
         {
             IconResourceId = iconResourceId;
+            TransParentIconResourceId = transparentIconResourceId;
+            TransparentIconColor = transparentIconColor;
 
             CurrentChannel = new NotificationChannel(name.ToCamelCaseId().ToLower(), name, importance)
             {
