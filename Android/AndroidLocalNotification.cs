@@ -1,6 +1,11 @@
 ﻿namespace Zebble
 {
+    using Android.App;
+    using Android.Content;
+    using Android.OS;
+    using Newtonsoft.Json;
     using System;
+    using Zebble.Device;
 
     internal class AndroidLocalNotification
     {
@@ -12,5 +17,30 @@
         public DateTime NotifyTime { get; set; }
         public bool PlaySound { set; get; }
         public string Parameters { get; set; }
+
+        public Notification Render(Context context, string channelId)
+        {
+            var builder = new Notification.Builder(Application.Context, channelId)
+             .SetContentTitle(Title)
+             .SetContentText(Body)
+             .SetAutoCancel(autoCancel: true)
+             .SetSmallIcon(IconId);
+
+            if (PlaySound && !OS.IsAtLeast(BuildVersionCodes.O))
+                builder.SetSound(LocalNotification.GetSoundUri(), LocalNotification.GetAudioAttributes());
+
+            builder.SetContentIntent(CreateLaunchIntent(context));
+            return builder.Build();
+        }
+
+        PendingIntent CreateLaunchIntent(Context context)
+        {
+            var resultIntent = UIRuntime.LauncherActivity;
+
+            // In case the application needs launch data:
+            resultIntent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
+
+            return PendingIntent.GetActivity(context, IntentId, resultIntent, PendingIntentFlags.UpdateCurrent);
+        }
     }
 }

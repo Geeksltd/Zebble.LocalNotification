@@ -13,10 +13,10 @@
 
     public static partial class LocalNotification
     {
+        static NotificationChannel CurrentChannel;
         internal const string LocalNotificationKey = "LocalNotification";
         internal static ScheduledAlarmHandler ReceiverInstance;
-
-        internal static int NotificationIconId { get; set; }
+        public static int IconResourceId = Android.Resource.Drawable.IcNotificationOverlay;
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
 
@@ -26,77 +26,49 @@
 
         public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            await CreateNotification(new AndroidLocalNotification
+            var noti = CreateNotification(title, body, playSound, 0, parameters);
+            await CreateNotification(noti, UIRuntime.CurrentActivity);
+            return true;
+        }
+
+        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, int id, Dictionary<string, string> parameters)
+        {
+            var result = new AndroidLocalNotification
             {
                 Title = title,
                 Body = body,
                 PlaySound = playSound,
-                Id = 0,
+                Id = id,
                 IntentId = GetUniqueId,
-                IconId = UIRuntime.NotificationSmallIcon,
+                IconId = IconResourceId,
                 NotifyTime = DateTime.Now,
                 Parameters = parameters.DicToString()
-            });
-            return true;
+            };
+
+            return result;
         }
 
         public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var intent = CreateIntent(id);
-            var packageName = UIRuntime.CurrentActivity.ApplicationContext.PackageName;
+            var notification = CreateNotification(title, body, playSound, id, parameters);
 
-            var localNotification = new AndroidLocalNotification
-            {
-                Title = title,
-                Body = body,
-                Id = id,
-                IntentId = GetUniqueId,
-                IconId = UIRuntime.NotificationSmallIcon,
-                NotifyTime = notifyTime,
-                PlaySound = playSound,
-                Parameters = parameters.DicToString()
-            };
+            var intent = AsAlarmHandlerIntent(id)
+                .PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
 
-            if (NotificationIconId != 0) localNotification.IconId = NotificationIconId;
-
-            var serializedNotification = JsonConvert.SerializeObject(localNotification);
-            intent.PutExtra(LocalNotificationKey, serializedNotification);
-
-            AlarmManager.Set(AlarmType.RtcWakeup,
-               triggerAtMillis: localNotification.NotifyTime.ToUnixEpoch(),
-               operation: intent.ToPendingBroadcast());
+            AlarmManager.Set(AlarmType.RtcWakeup, notifyTime.ToUnixEpoch(), intent.ToPendingBroadcast());
 
             return Task.FromResult(result: true);
         }
 
         public static Task Cancel(int id)
         {
-            AlarmManager.Cancel(CreateIntent(id).ToPendingBroadcast());
+            AlarmManager.Cancel(AsAlarmHandlerIntent(id).ToPendingBroadcast());
             NotificationManager.Cancel(id);
 
             return Task.CompletedTask;
         }
 
-        public static Task Initialize(Intent intent, Action<Notification> OnTapped = null)
-        {
-            UIRuntime.OnNewIntent.Handle(async mainIntent =>
-             {
-                 await OnNotificationTapped(intent, OnTapped);
 
-                 if (OS.IsAtLeast(BuildVersionCodes.O))
-                 {
-                     var serviceIntent = new Intent(UIRuntime.CurrentActivity, typeof(ScheduledAlarmService));
-                     UIRuntime.CurrentActivity.StartService(serviceIntent);
-                 }
-                 else
-                 {
-                     var intentFilter = await SetActionFilters();
-                     UIRuntime.CurrentActivity.RegisterReceiver(ReceiverInstance, intentFilter);
-                 }
-             });
-
-            return Task.CompletedTask;
-        }
 
         public static void Destroy()
         {
@@ -129,35 +101,51 @@
             return Task.FromResult(intentFilter);
         }
 
-        internal static Task CreateNotification(AndroidLocalNotification notification, Context context = null)
+        public static void Configure(string name, string description, int iconResourceId, bool sound, NotificationImportance importance = NotificationImportance.High)
         {
-            var currentcontext = context ?? UIRuntime.CurrentActivity;
+            IconResourceId = iconResourceId;
 
-            var builder = new Android.App.Notification.Builder(Application.Context)
-                .SetContentTitle(notification.Title)
-                .SetContentText(notification.Body)
-                .SetAutoCancel(autoCancel: true)
-                .SetSmallIcon(notification.IconId);
-
-            if (OS.IsAtLeast(BuildVersionCodes.O))
+            CurrentChannel = new NotificationChannel(name.ToCamelCaseId().ToLower(), name, importance)
             {
-                var channelId = Guid.NewGuid().ToString();
-                var channel = new NotificationChannel(channelId, "app_channel_name", NotificationImportance.Default);
-                NotificationManager.CreateNotificationChannel(channel);
+                Description = description
+            };
 
-                builder.SetChannelId(channelId);
-            }
+            if (sound) CurrentChannel.SetSound(GetSoundUri(), GetAudioAttributes());
 
-            if (notification.PlaySound) builder.SetSound(RingtoneManager.GetDefaultUri(RingtoneType.Notification));
+            NotificationManager.CreateNotificationChannel(CurrentChannel);
+        }
 
-            if (NotificationIconId != 0) builder.SetSmallIcon(NotificationIconId);
+        public static Task Initialize(Intent intent, Action<Notification> OnTapped = null)
+        {
+            UIRuntime.OnNewIntent.Handle(async mainIntent =>
+            {
+                await OnNotificationTapped(intent, OnTapped);
 
-            var resultIntent = UIRuntime.LauncherActivity;
-            resultIntent.PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
-            var resultPendingIntent = PendingIntent.GetActivity(currentcontext, notification.IntentId, resultIntent, PendingIntentFlags.UpdateCurrent);
+                if (OS.IsAtLeast(BuildVersionCodes.O))
+                {
+                    var serviceIntent = new Intent(UIRuntime.CurrentActivity, typeof(ScheduledAlarmService));
+                    UIRuntime.CurrentActivity.StartService(serviceIntent);
+                }
+                else
+                {
+                    var intentFilter = await SetActionFilters();
+                    UIRuntime.CurrentActivity.RegisterReceiver(ReceiverInstance, intentFilter);
+                }
+            });
 
-            builder.SetContentIntent(resultPendingIntent);
-            NotificationManager.Notify(notification.Id, builder.Build());
+            return Task.CompletedTask;
+        }
+
+        internal static AudioAttributes GetAudioAttributes() => new AudioAttributes.Builder().SetContentType(AudioContentType.Sonification).SetUsage(AudioUsageKind.Alarm).Build();
+
+        internal static Android.Net.Uri GetSoundUri() => RingtoneManager.GetDefaultUri(RingtoneType.Notification);
+
+        internal static Task CreateNotification(AndroidLocalNotification notification, Context context)
+        {
+            if (CurrentChannel == null)
+                throw new System.Exception("In MainActivity.OnCreate() call LocalNotification.CreateChannel(...).");
+
+            NotificationManager.Notify(notification.Id, notification.Render(context, CurrentChannel.Id));
 
             return Task.CompletedTask;
         }
@@ -184,7 +172,7 @@
             });
         }
 
-        static Intent CreateIntent(int id)
+        static Intent AsAlarmHandlerIntent(int id)
         {
             return new Intent(Application.Context, typeof(ScheduledAlarmHandler))
                 .SetAction("LocalNotifierIntent" + id);
