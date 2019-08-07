@@ -105,20 +105,23 @@
             return Task.FromResult(intentFilter);
         }
 
-        public static void Configure(string name, string description, int iconResourceId,int transparentIconResourceId,Color transparentIconColor, bool sound, NotificationImportance importance = NotificationImportance.High)
+        public static void Configure(string name, string description, int iconResourceId, int transparentIconResourceId, Color transparentIconColor, bool sound, NotificationImportance importance = NotificationImportance.High)
         {
             IconResourceId = iconResourceId;
             TransParentIconResourceId = transparentIconResourceId;
             TransparentIconColor = transparentIconColor;
 
-            CurrentChannel = new NotificationChannel(name.ToCamelCaseId().ToLower(), name, importance)
+            if (OS.IsAtLeast(BuildVersionCodes.O))
             {
-                Description = description
-            };
+                CurrentChannel = new NotificationChannel(name.ToCamelCaseId().ToLower(), name, importance)
+                {
+                    Description = description
+                };
 
-            if (sound) CurrentChannel.SetSound(GetSoundUri(), GetAudioAttributes());
+                if (sound) CurrentChannel.SetSound(GetSoundUri(), GetAudioAttributes());
 
-            NotificationManager.CreateNotificationChannel(CurrentChannel);
+                NotificationManager.CreateNotificationChannel(CurrentChannel);
+            }
         }
 
         public static Task Initialize(Intent intent, Action<Notification> OnTapped = null)
@@ -148,10 +151,10 @@
 
         internal static Task CreateNotification(AndroidLocalNotification notification, Context context)
         {
-            if (CurrentChannel == null)
+            if (OS.IsAtLeast(BuildVersionCodes.O) && CurrentChannel == null)
                 throw new System.Exception("In MainActivity.OnCreate() call LocalNotification.CreateChannel(...).");
 
-            NotificationManager.Notify(notification.Id, notification.Render(context, CurrentChannel.Id));
+            NotificationManager.Notify(notification.Id, notification.Render(context, CurrentChannel?.Id));
 
             return Task.CompletedTask;
         }

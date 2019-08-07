@@ -22,10 +22,14 @@
 
         public Notification Render(Context context, string channelId)
         {
-            var builder = new Notification.Builder(Application.Context, channelId)
-             .SetContentTitle(Title)
-             .SetContentText(Body)
-             .SetAutoCancel(autoCancel: true);
+            Notification.Builder builder;
+
+            if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(Application.Context, channelId);
+            else builder = new Notification.Builder(Application.Context);
+
+            builder.SetContentTitle(Title);
+            builder.SetContentText(Body);
+            builder.SetAutoCancel(autoCancel: true);
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
             {
