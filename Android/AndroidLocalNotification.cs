@@ -15,7 +15,7 @@
         public int IntentId { get; set; }
         public int IconId { get; set; }
         public int TransparentIconId { get; set; }
-        public Color TransparentIconColor { get; set; }
+        public string TransparentIconColor { get; set; }
         public DateTime NotifyTime { get; set; }
         public bool PlaySound { set; get; }
         public string Parameters { get; set; }
@@ -34,7 +34,7 @@
             if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
             {
                 builder.SetSmallIcon(TransparentIconId);
-                builder.SetColor(TransparentIconColor.Render().ToArgb());
+                builder.SetColor(Color.Parse(TransparentIconColor.Or("transparent")).Render().ToArgb());
             }
             else
             {

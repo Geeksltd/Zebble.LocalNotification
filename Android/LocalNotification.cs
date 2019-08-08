@@ -44,7 +44,7 @@
                 IntentId = GetUniqueId,
                 IconId = IconResourceId,
                 TransparentIconId = TransParentIconResourceId,
-                TransparentIconColor = TransparentIconColor,
+                TransparentIconColor = TransparentIconColor.ToStringOrEmpty().Or("transparent"),
                 NotifyTime = DateTime.Now,
                 Parameters = parameters.DicToString()
             };
