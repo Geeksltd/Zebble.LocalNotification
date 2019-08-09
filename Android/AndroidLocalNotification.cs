@@ -24,14 +24,14 @@
         {
             Notification.Builder builder;
 
-            if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(Application.Context, channelId);
-            else builder = new Notification.Builder(Application.Context);
+            if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(context, channelId);
+            else builder = new Notification.Builder(context);
 
             builder.SetContentTitle(Title);
             builder.SetContentText(Body);
             builder.SetAutoCancel(autoCancel: true);
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)
+            if (OS.IsAtLeast(BuildVersionCodes.Lollipop))
             {
                 builder.SetSmallIcon(TransparentIconId);
                 builder.SetColor(Color.Parse(TransparentIconColor.Or("transparent")).Render().ToArgb());
