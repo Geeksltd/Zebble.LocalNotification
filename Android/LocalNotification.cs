@@ -59,7 +59,7 @@
             var intent = AsAlarmHandlerIntent(id)
                 .PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
 
-            AlarmManager.Set(AlarmType.RtcWakeup, notifyTime.ToUnixEpoch(), intent.ToPendingBroadcast());
+            AlarmManager.SetExact(AlarmType.RtcWakeup, notifyTime.ToUnixEpoch(), intent.ToPendingBroadcast());
 
             return Task.FromResult(result: true);
         }
