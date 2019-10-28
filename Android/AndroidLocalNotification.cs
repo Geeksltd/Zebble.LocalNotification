@@ -13,15 +13,15 @@
         public string Body { get; set; }
         public int Id { get; set; }
         public int IntentId { get; set; }
-        public int IconId { get; set; }
-        public int TransparentIconId { get; set; }
+        public AndroidNotificationIcon Icon { get; set; }
+        public AndroidNotificationIcon TransparentIcon { get; set; }
         public string TransparentIconColor { get; set; }
         public DateTime NotifyTime { get; set; }
         public bool PlaySound { set; get; }
         public string Parameters { get; set; }
 
         public Notification Render(Context context, string channelId)
-        {
+        {            
             Notification.Builder builder;
 
             if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(context, channelId);
@@ -33,12 +33,12 @@
 
             if (OS.IsAtLeast(BuildVersionCodes.Lollipop))
             {
-                builder.SetSmallIcon(TransparentIconId);
+                builder.SetSmallIcon(TransparentIcon.ConvertToId(context));
                 builder.SetColor(Color.Parse(TransparentIconColor.Or("transparent")).Render().ToArgb());
             }
             else
             {
-                builder.SetSmallIcon(IconId);
+                builder.SetSmallIcon(Icon.ConvertToId(context));
             }
 
             if (PlaySound && !OS.IsAtLeast(BuildVersionCodes.O))

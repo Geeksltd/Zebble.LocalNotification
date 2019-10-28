@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AndroidLocalNotification.cs" />
+    <Compile Include="AndroidNotificationIcon.cs" />
     <Compile Include="LocalNotification.cs" />
     <Compile Include="LocalNotificationExtensions.cs" />
     <Compile Include="ScheduledAlarmHandler.cs" />

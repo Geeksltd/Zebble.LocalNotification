@@ -16,8 +16,9 @@
         static NotificationChannel CurrentChannel;
         internal const string LocalNotificationKey = "LocalNotification";
         internal static ScheduledAlarmHandler ReceiverInstance;
-        public static int IconResourceId = Android.Resource.Drawable.IcNotificationOverlay;
-        public static int TransParentIconResourceId = Android.Resource.Drawable.IcNotificationOverlay;
+
+        public static AndroidNotificationIcon Icon;
+        public static AndroidNotificationIcon TransparentIcon;
         public static Color TransparentIconColor = Colors.White;
 
         internal static NotificationManager NotificationManager => NotificationManager.FromContext(Application.Context);
@@ -42,8 +43,8 @@
                 PlaySound = playSound,
                 Id = id,
                 IntentId = GetUniqueId,
-                IconId = IconResourceId,
-                TransparentIconId = TransParentIconResourceId,
+                Icon = Icon,
+                TransparentIcon = TransparentIcon,
                 TransparentIconColor = TransparentIconColor.ToStringOrEmpty().Or("transparent"),
                 NotifyTime = DateTime.Now,
                 Parameters = parameters.DicToString()
@@ -71,8 +72,6 @@
 
             return Task.CompletedTask;
         }
-
-
 
         public static void Destroy()
         {
@@ -107,8 +106,8 @@
 
         public static void Configure(string name, string description, int iconResourceId, int transparentIconResourceId, Color transparentIconColor, bool sound, NotificationImportance importance = NotificationImportance.High)
         {
-            IconResourceId = iconResourceId;
-            TransParentIconResourceId = transparentIconResourceId;
+            Icon = new AndroidNotificationIcon(iconResourceId);
+            TransparentIcon = new AndroidNotificationIcon(transparentIconResourceId);
             TransparentIconColor = transparentIconColor;
 
             if (OS.IsAtLeast(BuildVersionCodes.O))
