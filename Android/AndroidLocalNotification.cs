@@ -21,7 +21,7 @@
         public string Parameters { get; set; }
 
         public Notification Render(Context context, string channelId)
-        {            
+        {
             Notification.Builder builder;
 
             if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(context, channelId);
@@ -33,12 +33,14 @@
 
             if (OS.IsAtLeast(BuildVersionCodes.Lollipop))
             {
-                builder.SetSmallIcon(TransparentIcon.ConvertToId(context));
+                if (TransparentIcon?.Name.HasValue() == true)
+                    builder.SetSmallIcon(TransparentIcon.ConvertToId(context));
                 builder.SetColor(Color.Parse(TransparentIconColor.Or("transparent")).Render().ToArgb());
             }
             else
             {
-                builder.SetSmallIcon(Icon.ConvertToId(context));
+                if (Icon?.Name.HasValue() == true)
+                    builder.SetSmallIcon(Icon.ConvertToId(context));
             }
 
             if (PlaySound && !OS.IsAtLeast(BuildVersionCodes.O))
