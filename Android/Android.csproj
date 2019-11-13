@@ -59,6 +59,7 @@
     <Compile Include="LocalNotification.cs" />
     <Compile Include="LocalNotificationExtensions.cs" />
     <Compile Include="ScheduledAlarmHandler.cs" />
+    <Compile Include="ScheduledAlarmService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Zebble.exe" />
