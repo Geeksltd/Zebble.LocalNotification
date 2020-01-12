@@ -2,9 +2,12 @@
 {
     using Android.App;
     using Android.Content;
+    using Android.Media;
     using Android.OS;
+    using Android.Support.V4.App;
     using Newtonsoft.Json;
     using System;
+    using System.Collections.Generic;
     using Zebble.Device;
 
     internal class AndroidLocalNotification
@@ -16,38 +19,60 @@
         public AndroidNotificationIcon Icon { get; set; }
         public AndroidNotificationIcon TransparentIcon { get; set; }
         public string TransparentIconColor { get; set; }
-        public DateTime NotifyTime { get; set; }
+        public DateTime NotifyTime { get; set; } = DateTime.Now;
         public bool PlaySound { set; get; }
         public string Parameters { get; set; }
 
         public Notification Render(Context context, string channelId)
         {
-            Notification.Builder builder;
+            // Instantiate the builder and set notification elements:
+            var builder = new NotificationCompat.Builder(context, channelId)
+                .SetContentTitle(Title)
+                .SetContentText(Body)
+                .SetVisibility((int)NotificationVisibility.Public)
+                .SetCategory(Notification.CategoryMessage)
+                .SetContentIntent(CreateLaunchIntent(context));
 
-            if (OS.IsAtLeast(BuildVersionCodes.O)) builder = new Notification.Builder(context, channelId);
-            else builder = new Notification.Builder(context);
+            builder.SetWhen(NotifyTime.ToUnixEpoch());
 
-            builder.SetContentTitle(Title);
-            builder.SetContentText(Body);
-            builder.SetAutoCancel(autoCancel: true);
+            if (Icon?.Name.HasValue() == true)
+                builder.SetSmallIcon(Icon.ConvertToId(context));
 
-            if (OS.IsAtLeast(BuildVersionCodes.Lollipop))
+            if (OS.IsAtLeast(BuildVersionCodes.Lollipop) && TransparentIcon?.Name.HasValue() == true)
             {
-                if (TransparentIcon?.Name.HasValue() == true)
-                    builder.SetSmallIcon(TransparentIcon.ConvertToId(context));
+                builder.SetSmallIcon(TransparentIcon.ConvertToId(context));
                 builder.SetColor(Color.Parse(TransparentIconColor.Or("transparent")).Render().ToArgb());
             }
-            else
+
+            if (PlaySound) builder.SetSound(LocalNotification.GetSoundUri());
+
+            var notification = builder.Build();
+
+            var notificationManager = context.GetSystemService(Context.NotificationService) as NotificationManager;
+            notificationManager.Notify(Id, notification);
+
+            EnsureScreenLightIsOn(context);
+
+            return notification;
+        }
+
+        void EnsureScreenLightIsOn(Context context)
+        {
+            try
             {
-                if (Icon?.Name.HasValue() == true)
-                    builder.SetSmallIcon(Icon.ConvertToId(context));
+                var pm = (PowerManager)context.GetSystemService(Context.PowerService);
+
+                var isScreenOn = OS.IsAtLeast(BuildVersionCodes.KitkatWatch) ? pm.IsInteractive : pm.IsScreenOn;
+                if (!isScreenOn)
+                {
+                    var wl = pm.NewWakeLock(WakeLockFlags.ScreenDim | WakeLockFlags.AcquireCausesWakeup, GetType().FullName);
+                    wl.Acquire(3000); //set your time in milliseconds
+                }
             }
+            catch
+            {
 
-            if (PlaySound && !OS.IsAtLeast(BuildVersionCodes.O))
-                builder.SetSound(LocalNotification.GetSoundUri(), LocalNotification.GetAudioAttributes());
-
-            builder.SetContentIntent(CreateLaunchIntent(context));
-            return builder.Build();
+            }
         }
 
         PendingIntent CreateLaunchIntent(Context context)
