@@ -84,5 +84,19 @@
 
             return PendingIntent.GetActivity(context, IntentId, resultIntent, PendingIntentFlags.UpdateCurrent);
         }
+
+        internal Notification Register(Context context)
+        {
+            if (OS.IsAtLeast(BuildVersionCodes.O) && LocalNotification.CurrentChannel == null)
+                throw new Exception("In MainActivity.OnCreate() call LocalNotification.CreateChannel(...).");
+
+            var native = Render(context, LocalNotification.CurrentChannel?.Id);
+
+            Manager.Notify(Id, native);
+
+            return native;
+        }
+
+        internal static NotificationManager Manager => NotificationManager.FromContext(Application.Context);
     }
 }

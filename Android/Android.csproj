@@ -148,7 +148,6 @@
     <Compile Include="LocalNotification.cs" />
     <Compile Include="LocalNotificationExtensions.cs" />
     <Compile Include="ScheduledAlarmHandler.cs" />
-    <Compile Include="ScheduledAlarmService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Zebble.exe" />
@@ -206,7 +205,7 @@
   </Target>
   <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(OutDir)Zebble.LocalNotification.Android.* E:\Projects\WordUp2019\Wordatown.App\packages\Zebble.LocalNotification.1.0.133\lib\MonoAndroid10</PostBuildEvent>
+    <PostBuildEvent>copy /y $(TargetDir)Zebble.LocalNotification.Android.* E:\Projects\WordUp2019\Wordatown.App\packages\Zebble.LocalNotification.1.0.135\lib\MonoAndroid10</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Xamarin.Android.Support.Annotations.28.0.0.3\build\monoandroid90\Xamarin.Android.Support.Annotations.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Annotations.28.0.0.3\build\monoandroid90\Xamarin.Android.Support.Annotations.targets')" />
   <Import Project="..\packages\Xamarin.Android.Arch.Core.Common.1.1.1.3\build\monoandroid90\Xamarin.Android.Arch.Core.Common.targets" Condition="Exists('..\packages\Xamarin.Android.Arch.Core.Common.1.1.1.3\build\monoandroid90\Xamarin.Android.Arch.Core.Common.targets')" />
