@@ -111,5 +111,24 @@
 
             return Task.CompletedTask;
         }
+
+        public static void UpdateBadgeCount(int value)
+        {
+            var badgeXml = BadgeUpdateManager.GetTemplateContent(BadgeTemplateType.BadgeNumber);
+                       
+            var badgeElement = badgeXml.SelectSingleNode("/badge") as XmlElement;
+            badgeElement.SetAttribute("value", value.ToString());
+            var badge = new BadgeNotification(badgeXml);
+            var badgeUpdater =
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            badgeUpdater.Update(badge);
+        }
+
+        public static void RemoveBadgeCount()
+        {
+            BadgeUpdateManager.CreateBadgeUpdaterForApplication().Clear();
+        }
+
     }
 }

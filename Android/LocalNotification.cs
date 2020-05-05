@@ -110,6 +110,16 @@
             });
         }
 
+        public static void UpdateBadgeCount(int value)
+        {
+            XamarinShortcutBadger.ShortcutBadger.ApplyCount(UIRuntime.CurrentActivity, value);
+        }
+
+        public static void RemoveBadgeCount()
+        {
+            XamarinShortcutBadger.ShortcutBadger.RemoveCount(UIRuntime.CurrentActivity);
+        }
+
         static void StartScheduledAlarmHandler()
         {
             var handler = new ScheduledAlarmHandler();

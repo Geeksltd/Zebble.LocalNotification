@@ -2,12 +2,10 @@
 {
     using Android.App;
     using Android.Content;
-    using Android.Media;
     using Android.OS;
     using Android.Support.V4.App;
     using Newtonsoft.Json;
     using System;
-    using System.Collections.Generic;
     using Zebble.Device;
 
     internal class AndroidLocalNotification

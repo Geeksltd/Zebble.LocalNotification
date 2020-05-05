@@ -10,7 +10,11 @@
     <description>A Zebble plugin that enables you to send or schedule native local notifications.</description>
     <authors>Geeks Ltd</authors>
     <owners>Geeks Ltd</owners>
-    <dependencies></dependencies>
+    <dependencies>
+      <group targetFramework="MonoAndroid">
+        <dependency id="Xamarin.ShortcutBadger" version="1.1.21" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="..\..\lib\Zebble.LocalNotification.iOS.*" target="lib\Xamarin.iOS10\" />

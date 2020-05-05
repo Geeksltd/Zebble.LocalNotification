@@ -135,6 +135,9 @@
     <Reference Include="Xamarin.Android.Support.ViewPager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Xamarin.Android.Support.ViewPager.28.0.0.3\lib\monoandroid90\Xamarin.Android.Support.ViewPager.dll</HintPath>
     </Reference>
+    <Reference Include="XamarinShortcutBadger, Version=1.1.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xamarin.ShortcutBadger.1.1.21\lib\MonoAndroid\XamarinShortcutBadger.dll</HintPath>
+    </Reference>
     <Reference Include="Zebble.Android, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Zebble.4.4.270\lib\MonoAndroid10\Zebble.Android.dll</HintPath>
     </Reference>

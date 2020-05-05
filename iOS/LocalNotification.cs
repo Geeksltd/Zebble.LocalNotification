@@ -107,7 +107,19 @@
 
             UNUserNotificationCenter.Current.Delegate = new UserNotificationCenterDelegate();
 
+            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Badge, (granted, error) => { });
+
             return Task.CompletedTask;
+        }
+
+        public static void UpdateBadgeCount(int value)
+        {
+            Thread.UI.Run(() => UIApplication.SharedApplication.ApplicationIconBadgeNumber = value);
+        }
+
+        public static void RemoveBadgeCount()
+        {
+            Thread.UI.Run(() => UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0);
         }
 
         static void ShowUserNotification(string title, string body, int id, UNNotificationTrigger trigger, bool playSound = false, Dictionary<string, string> parameters = null)
