@@ -107,8 +107,6 @@
 
             UNUserNotificationCenter.Current.Delegate = new UserNotificationCenterDelegate();
 
-            UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Badge, (granted, error) => { });
-
             return Task.CompletedTask;
         }
 
