@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Zebble.LocalNotification</id>
-    <version>1.1.137</version>
+    <version>1.1.138</version>
     <title>Local notification implementation for Zebble (Xamarin)</title>
     <projectUrl>https://github.com/Geeksltd/Zebble.LocalNotification</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Geeksltd/Zebble.LocalNotification/master/Shared/NuGet/Icon.png</iconUrl>
