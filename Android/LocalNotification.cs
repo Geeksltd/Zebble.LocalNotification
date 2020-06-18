@@ -8,9 +8,9 @@
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Android.Runtime;
+    using AndroidX.LocalBroadcastManager.Content;
 
     public static partial class LocalNotification
     {
@@ -129,7 +129,7 @@
             filter.AddAction("android.intent.action.SCREEN_OFF");
             filter.AddAction("android.intent.action.BOOT_COMPLETED");
 
-            var manager = Android.Support.V4.Content.LocalBroadcastManager.GetInstance(UIRuntime.CurrentActivity);
+            var manager = LocalBroadcastManager.GetInstance(UIRuntime.CurrentActivity);
             manager.RegisterReceiver(handler, filter);
 
             App.Stopping += () =>

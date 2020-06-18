@@ -1,7 +1,6 @@
 ﻿namespace Zebble.Device
 {
     using Android.Content;
-    using Android.OS;
     using Newtonsoft.Json;
     using System;
 
