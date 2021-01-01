@@ -1,4 +1,4 @@
-[logo]: https://raw.githubusercontent.com/Geeksltd/Zebble.LocalNotification/master/Shared/NuGet/Icon.png "Zebble.LocalNotification"
+ï»¿[logo]: https://raw.githubusercontent.com/Geeksltd/Zebble.LocalNotification/master/icon.png "Zebble.LocalNotification"
 
 
 ## Zebble.LocalNotification
@@ -59,7 +59,7 @@ protected override async void OnCreate(Bundle bundle)
     await (StartUp.Current = new UI.StartUp()).Run();
 }
 ```
- 
+ï¿½
 #### iOS
 
 Call Initialize method of LocalNotification in FinishedLaunching method of AppDelegate class:

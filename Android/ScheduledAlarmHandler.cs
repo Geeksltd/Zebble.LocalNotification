@@ -1,8 +1,10 @@
 ﻿namespace Zebble.Device
 {
     using Android.Content;
+    using Context = Android.Content.Context;
     using Newtonsoft.Json;
     using System;
+    using Olive;
 
     [BroadcastReceiver(Enabled = true, Label = "Local Notifications Plugin Broadcast Receiver")]
     public class ScheduledAlarmHandler : BroadcastReceiver
@@ -13,7 +15,7 @@
         {
             var extra = intent.GetStringExtra(LocalNotification.LocalNotificationKey);
 
-            if (extra.LacksValue()) return;
+            if (extra.IsEmpty()) return;
 
             try
             {

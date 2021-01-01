@@ -2,6 +2,7 @@
 {
     using Android.App;
     using Android.Content;
+    using Context = Android.Content.Context;
     using Android.Media;
     using Android.OS;
     using Java.Lang;
@@ -11,6 +12,7 @@
     using System.Threading.Tasks;
     using Android.Runtime;
     using AndroidX.LocalBroadcastManager.Content;
+    using Olive;
 
     public static partial class LocalNotification
     {
@@ -57,7 +59,7 @@
             var notification = CreateNotification(title, body, playSound, id, parameters);
             var intent = CreateAlarmHandlerIntent(id, notification);
 
-            AlarmManager.SetExact(AlarmType.RtcWakeup, notifyTime.ToUnixEpoch(), intent);
+            AlarmManager.SetExact(AlarmType.RtcWakeup, notifyTime.ToUnixTime(), intent);
 
             return Task.FromResult(result: true);
         }
@@ -97,7 +99,7 @@
 
             var extra = intent.GetStringExtra(LocalNotificationKey);
             intent.RemoveExtra(LocalNotificationKey);
-            if (extra.LacksValue()) return;
+            if (extra.IsEmpty()) return;
 
             var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
             OnTapped(new Notification

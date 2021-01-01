@@ -1,14 +1,15 @@
 ﻿namespace Zebble
 {
     using Android.App;
-    using Android.Content;
+    using Context = Android.Content.Context;
     using Android.OS;
     using AndroidX.Core.App;
     using Newtonsoft.Json;
     using System;
     using Zebble.Device;
+    using Olive;
 
-    internal class AndroidLocalNotification
+    class AndroidLocalNotification
     {
         public string Title { get; set; }
         public string Body { get; set; }
@@ -31,7 +32,7 @@
                 .SetCategory(Notification.CategoryMessage)
                 .SetContentIntent(CreateLaunchIntent(context));
 
-            builder.SetWhen(NotifyTime.ToUnixEpoch());
+            builder.SetWhen(NotifyTime.ToUnixTime());
 
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));
