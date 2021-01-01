@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Windows.Data.Xml.Dom;
     using Windows.UI.Notifications;
+    using Olive;
 
     public static partial class LocalNotification
     {
