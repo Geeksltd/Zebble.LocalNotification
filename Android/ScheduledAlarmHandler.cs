@@ -28,7 +28,7 @@
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                Log.For(this).Error(ex);
             }
         }
     }

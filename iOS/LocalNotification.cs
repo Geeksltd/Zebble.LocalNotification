@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
     using UIKit;
     using UserNotifications;
+    using Olive;
 
     public static partial class LocalNotification
     {
@@ -36,7 +37,7 @@
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                Log.For(typeof(LocalNotification)).Error(ex);
                 return false;
             }
         }
