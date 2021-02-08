@@ -59,7 +59,9 @@
             var notification = CreateNotification(title, body, playSound, id, parameters);
             var intent = CreateAlarmHandlerIntent(id, notification);
 
-            AlarmManager.SetExact(AlarmType.RtcWakeup, notifyTime.ToUnixTime(), intent);
+            var milliseconds = (long)notifyTime.ToUniversal().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+
+            AlarmManager.SetExact(AlarmType.RtcWakeup, milliseconds, intent);
 
             return Task.FromResult(result: true);
         }

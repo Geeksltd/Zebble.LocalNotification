@@ -7,7 +7,7 @@
     <RootNamespace>Zebble</RootNamespace>
     <PackageId>Zebble.LocalNotification</PackageId>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <Version>1.1.144.0</Version>
+    <Version>1.1.145.0</Version>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>default</LangVersion>
@@ -28,6 +28,8 @@
     <Authors>Geeks Ltd</Authors>
     <Copyright>Geeks Ltd 2020, All rights reserved.</Copyright>
     <DisableExtraReferences>true</DisableExtraReferences>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj/**</DefaultItemExcludes>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
     <DebugSymbols>true</DebugSymbols>
