@@ -8,6 +8,8 @@
     using System;
     using Zebble.Device;
     using Olive;
+    using Android.Content;
+    using System.Collections.Generic;
 
     class AndroidLocalNotification
     {
@@ -20,11 +22,10 @@
         public string TransparentIconColor { get; set; }
         public DateTime NotifyTime { get; set; } = DateTime.Now;
         public bool PlaySound { set; get; }
-        public string Parameters { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
 
         public Notification Render(Context context, string channelId)
         {
-            // Instantiate the builder and set notification elements:
             var builder = new NotificationCompat.Builder(context, channelId)
                 .SetContentTitle(Title)
                 .SetContentText(Body)
@@ -45,57 +46,15 @@
 
             if (PlaySound) builder.SetSound(LocalNotification.GetSoundUri());
 
-            var notification = builder.Build();
-
-            var notificationManager = context.GetSystemService(Context.NotificationService) as NotificationManager;
-            notificationManager.Notify(Id, notification);
-
-            EnsureScreenLightIsOn(context);
-
-            return notification;
-        }
-
-        void EnsureScreenLightIsOn(Context context)
-        {
-            try
-            {
-                var pm = (PowerManager)context.GetSystemService(Context.PowerService);
-
-                var isScreenOn = OS.IsAtLeast(BuildVersionCodes.KitkatWatch) ? pm.IsInteractive : pm.IsScreenOn;
-                if (!isScreenOn)
-                {
-                    var wl = pm.NewWakeLock(WakeLockFlags.ScreenDim | WakeLockFlags.AcquireCausesWakeup, GetType().FullName);
-                    wl.Acquire(3000); //set your time in milliseconds
-                }
-            }
-            catch
-            {
-
-            }
+            return builder.Build();
         }
 
         PendingIntent CreateLaunchIntent(Context context)
         {
-            var resultIntent = UIRuntime.LauncherActivity;
+            var intent = new Intent(context, UIRuntime.CurrentActivity.GetType())
+                .PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
 
-            // In case the application needs launch data:
-            resultIntent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
-
-            return PendingIntent.GetActivity(context, IntentId, resultIntent, PendingIntentFlags.UpdateCurrent);
+            return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent);
         }
-
-        internal Notification Register(Context context)
-        {
-            if (OS.IsAtLeast(BuildVersionCodes.O) && LocalNotification.CurrentChannel == null)
-                throw new Exception("In MainActivity.OnCreate() call LocalNotification.CreateChannel(...).");
-
-            var native = Render(context, LocalNotification.CurrentChannel?.Id);
-
-            Manager.Notify(Id, native);
-
-            return native;
-        }
-
-        internal static NotificationManager Manager => NotificationManager.FromContext(Application.Context);
     }
 }

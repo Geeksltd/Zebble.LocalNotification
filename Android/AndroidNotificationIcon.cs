@@ -8,8 +8,6 @@ namespace Zebble
         public string Type { get; set; }
         public string Package { get; set; }
 
-        public AndroidNotificationIcon() { }
-
         public AndroidNotificationIcon(int iconId)
         {
             if (iconId == 0) return;

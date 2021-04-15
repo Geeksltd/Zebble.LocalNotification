@@ -7,7 +7,7 @@
     {
         public static PendingIntent ToPendingBroadcast(this Intent intent)
         {
-            return PendingIntent.GetBroadcast(Application.Context, 0, intent, PendingIntentFlags.UpdateCurrent);
+            return PendingIntent.GetBroadcast(UIRuntime.CurrentActivity, 0, intent, PendingIntentFlags.UpdateCurrent);
         }
     }
 }
