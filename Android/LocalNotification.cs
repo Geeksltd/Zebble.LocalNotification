@@ -41,7 +41,10 @@
             var intent = CreateAlarmHandlerIntent(id, notification);
             var milliseconds = ((DateTimeOffset)notifyTime).ToUnixTimeMilliseconds();
 
-            AlarmManager.SetExact(AlarmType.RtcWakeup, milliseconds, intent);
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+                AlarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, milliseconds, intent);
+            else
+                AlarmManager.SetExact(AlarmType.RtcWakeup, milliseconds, intent);
 
             return Task.FromResult(result: true);
         }
