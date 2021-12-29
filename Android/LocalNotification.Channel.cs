@@ -17,7 +17,7 @@
 
             if (sound) CurrentChannel.SetSound(GetSoundUri(), GetAudioAttributes());
 
-            NotificationManager.CreateNotificationChannel(CurrentChannel);
+            GetNotificationManager(UIRuntime.CurrentActivity).CreateNotificationChannel(CurrentChannel);
         }
 
         internal static Android.Net.Uri GetSoundUri() => RingtoneManager.GetDefaultUri(RingtoneType.Notification);

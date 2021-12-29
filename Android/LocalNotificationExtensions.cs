@@ -5,9 +5,9 @@
 
     static class LocalNotificationExtensions
     {
-        public static PendingIntent ToPendingBroadcast(this Intent intent)
+        public static PendingIntent ToPendingBroadcast(this Intent intent, Android.Content.Context context)
         {
-            return PendingIntent.GetBroadcast(UIRuntime.CurrentActivity, 0, intent, PendingIntentFlags.UpdateCurrent);
+            return PendingIntent.GetBroadcast(context, 0, intent, PendingIntentFlags.UpdateCurrent);
         }
     }
 }

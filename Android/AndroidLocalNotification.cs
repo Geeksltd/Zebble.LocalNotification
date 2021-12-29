@@ -8,7 +8,6 @@
     using System;
     using Zebble.Device;
     using Olive;
-    using Android.Content;
     using System.Collections.Generic;
 
     class AndroidLocalNotification
@@ -17,6 +16,7 @@
         public string Body { get; set; }
         public int Id { get; set; }
         public int IntentId { get; set; }
+        public string ChannelId { get; set; }
         public AndroidNotificationIcon Icon { get; set; }
         public AndroidNotificationIcon TransparentIcon { get; set; }
         public string TransparentIconColor { get; set; }
@@ -24,9 +24,9 @@
         public bool PlaySound { set; get; }
         public Dictionary<string, string> Parameters { get; set; }
 
-        public Notification Render(Context context, string channelId)
+        public Notification Render(Context context)
         {
-            var builder = new NotificationCompat.Builder(context, channelId)
+            var builder = new NotificationCompat.Builder(context, ChannelId)
                 .SetContentTitle(Title)
                 .SetContentText(Body)
                 .SetVisibility((int)NotificationVisibility.Public)
@@ -51,8 +51,8 @@
 
         PendingIntent CreateLaunchIntent(Context context)
         {
-            var intent = new Intent(context, UIRuntime.CurrentActivity.GetType())
-                .PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
+            var intent = context.PackageManager.GetLaunchIntentForPackage(context.PackageName);
+            intent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
 
             return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent);
         }

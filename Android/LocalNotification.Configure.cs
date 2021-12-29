@@ -16,7 +16,7 @@
         static Color TransparentIconColor = Colors.White;
         static Action<Notification> OnTapped;
 
-        static NotificationManager NotificationManager => NotificationManager.FromContext(UIRuntime.CurrentActivity);
+        static NotificationManager GetNotificationManager(Android.Content.Context context) => NotificationManager.FromContext(context);
 
         public static void Configure(
             string name, string description, int iconResourceId, int transparentIconResourceId,

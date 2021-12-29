@@ -19,7 +19,7 @@
                 var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
                 if (notification is null) return;
 
-                LocalNotification.Show(notification);
+                LocalNotification.Show(context.ApplicationContext, notification);
             }
             catch (Exception ex)
             {

@@ -2,14 +2,18 @@
 {
     public static partial class LocalNotification
     {
-        public static void UpdateBadgeCount(int value)
+        public static void UpdateBadgeCount(int value) => UpdateBadgeCount(UIRuntime.CurrentActivity, value);
+
+        public static void UpdateBadgeCount(Android.Content.Context context, int value)
         {
-            XamarinShortcutBadger.ShortcutBadger.ApplyCount(UIRuntime.CurrentActivity, value);
+            XamarinShortcutBadger.ShortcutBadger.ApplyCount(context, value);
         }
 
-        public static void RemoveBadgeCount()
+        public static void RemoveBadgeCount() => RemoveBadgeCount(UIRuntime.CurrentActivity);
+
+        public static void RemoveBadgeCount(Android.Content.Context context)
         {
-            XamarinShortcutBadger.ShortcutBadger.RemoveCount(UIRuntime.CurrentActivity);
+            XamarinShortcutBadger.ShortcutBadger.RemoveCount(context);
         }
     }
 }
