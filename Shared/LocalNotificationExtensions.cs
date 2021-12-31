@@ -9,7 +9,7 @@
     {
         public static string DicToString(this Dictionary<string, string> value)
         {
-            if (value is null) return null;
+            if (value is null) return string.Empty;
 
             return string.Join(";", value.Select(x => x.Key + "=" + x.Value).ToArray());
         }
