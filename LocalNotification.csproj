@@ -6,7 +6,7 @@
     <RootNamespace>Zebble</RootNamespace>
     <PackageId>Zebble.LocalNotification</PackageId>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <Version>1.1.147.0</Version>
+    <Version>1.1.149.0</Version>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <DefineConstants>$(DefineConstants)</DefineConstants>
@@ -71,7 +71,6 @@
     <PackageReference Include="Zebble" Version="4.5.447" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Android\" />
     <Folder Include="iOS\" />
     <Folder Include="UWP\" />
   </ItemGroup>

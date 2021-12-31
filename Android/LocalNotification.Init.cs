@@ -18,7 +18,7 @@
 
         static NotificationManager GetNotificationManager(Android.Content.Context context) => NotificationManager.FromContext(context);
 
-        public static void Configure(
+        public static void Initialize(
             string name, string description, int iconResourceId, int transparentIconResourceId,
             Color transparentIconColor, bool sound, NotificationImportance importance = NotificationImportance.High,
             Action<Notification> onTapped = null)

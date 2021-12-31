@@ -33,7 +33,7 @@
                     ShowUserNotification(title, body, 0, trigger, playSound, parameters);
                     return true;
                 }
-                else return await Schedule(title, body, DateTime.Now, 0, parameters: parameters);
+                else return await Schedule(title, body, LocalTime.Now, 0, parameters: parameters);
             }
             catch (Exception ex)
             {
@@ -81,13 +81,14 @@
         {
             if (OS.IsAtLeastiOS(10))
             {
-                UNUserNotificationCenter.Current.RemovePendingNotificationRequests(new string[] { id.ToString() });
-                UNUserNotificationCenter.Current.RemoveDeliveredNotifications(new string[] { id.ToString() });
+                var ids = new string[] { id.ToString() };
+                UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
+                UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
             }
             else
             {
                 var notifications = UIApplication.SharedApplication.ScheduledLocalNotifications;
-                var notification = notifications.Where(n => n.UserInfo.ContainsKey(NSObject.FromObject(NOTIFICATION_KEY)))
+                var notification = notifications.Where(n => n.UserInfo?.ContainsKey(NSObject.FromObject(NOTIFICATION_KEY)) ?? false)
                     .FirstOrDefault(n => n.UserInfo[NOTIFICATION_KEY].Equals(NSObject.FromObject(id)));
 
                 if (notification != null) UIApplication.SharedApplication.CancelLocalNotification(notification);
@@ -96,15 +97,15 @@
             return Task.CompletedTask;
         }
 
-        public static Task Initialize(NSDictionary launchOptions, Action<Notification> OnTapped = null)
+        public static Task Initialize(NSDictionary launchOptions, Action<Notification> onTapped = null)
         {
             if (launchOptions != null && launchOptions.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
             {
                 if (launchOptions[UIApplication.LaunchOptionsLocalNotificationKey] is UILocalNotification notification)
-                    OnNotificationTapped(OnTapped, notification.UserInfo, isApplicationClosed: true);
+                    OnNotificationTapped(onTapped, notification.UserInfo, isApplicationClosed: true);
             }
 
-            UIRuntime.OnParameterRecieved.Handle(param => OnNotificationTapped(OnTapped, param: param));
+            UIRuntime.OnParameterRecieved.Handle(param => OnNotificationTapped(onTapped, param: param));
 
             UNUserNotificationCenter.Current.Delegate = new UserNotificationCenterDelegate();
 
@@ -130,14 +131,13 @@
                 new NSObject[] { NOTIFICATION_KEY.ToNs(), NOTIFICATION_PARAM_KEY.ToNs(),
                     NOTIFICATION_TITLE_KEY.ToNs(), NOTIFICATION_BODY_KEY.ToNs(), NOTIFICATION_Date_KEY.ToNs() });
 
-            var content = new UNMutableNotificationContent()
+            var content = new UNMutableNotificationContent
             {
                 Title = title,
                 Body = body,
-                UserInfo = userData
+                UserInfo = userData,
+                Sound = UNNotificationSound.Default
             };
-
-            content.Sound = UNNotificationSound.Default;
 
             var request = UNNotificationRequest.FromIdentifier(id.ToString(), content, trigger);
 
@@ -157,14 +157,14 @@
             };
         }
 
-        static Task OnNotificationTapped(Action<Notification> OnTapped, NSDictionary param = null, bool isApplicationClosed = false)
+        static Task OnNotificationTapped(Action<Notification> onTapped, NSDictionary param = null, bool isApplicationClosed = false)
         {
-            if (param == null || OnTapped == null) return Task.CompletedTask;
+            if (param == null || onTapped == null) return Task.CompletedTask;
 
-            if (!isApplicationClosed) raiseTapped();
-            else Task.Delay(1000).ContinueWith(t => raiseTapped());
+            if (!isApplicationClosed) RaiseTapped();
+            else Task.Delay(1000).ContinueWith(t => RaiseTapped());
 
-            void raiseTapped()
+            void RaiseTapped()
             {
                 if (param == null) return;
 
@@ -174,7 +174,7 @@
                 var parameters = param.ValueForKey(NOTIFICATION_PARAM_KEY.ToNs()).ToObject().ToString().StringToDic();
                 var notifyTime = (DateTime)param.ValueForKey(NOTIFICATION_Date_KEY.ToNs()).ToObject(typeof(DateTime));
 
-                OnTapped?.Invoke(new Notification
+                onTapped?.Invoke(new Notification
                 {
                     Id = id,
                     Body = body,
