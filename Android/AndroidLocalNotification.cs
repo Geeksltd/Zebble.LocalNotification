@@ -31,9 +31,8 @@
                 .SetContentText(Body)
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetCategory(Notification.CategoryMessage)
-                .SetContentIntent(CreateLaunchIntent(context));
-
-            builder.SetWhen(NotifyTime.ToUnixTime());
+                .SetContentIntent(CreateLaunchIntent(context))
+                .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
 
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));
