@@ -22,6 +22,7 @@
         public string TransparentIconColor { get; set; }
         public DateTime NotifyTime { get; set; } = DateTime.Now;
         public bool PlaySound { set; get; }
+        public int Priority { set; get; }
         public Dictionary<string, string> Parameters { get; set; }
 
         public Notification Render(Context context)
@@ -32,6 +33,7 @@
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetCategory(Notification.CategoryMessage)
                 .SetContentIntent(CreateLaunchIntent(context))
+                .SetPriority(Priority)
                 .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
 
             if (Icon?.Name.HasValue() == true)
