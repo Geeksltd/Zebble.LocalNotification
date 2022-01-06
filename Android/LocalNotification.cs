@@ -35,13 +35,14 @@
 
         public static Task<bool> Schedule(
             string title, string body, DateTime notifyTime, int id,
-            bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters , priority);
+            bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0
+        ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority);
 
         internal static Task<bool> Schedule(
             Android.Content.Context context, string title, string body, DateTime notifyTime,
-            int id, bool playSound = false, Dictionary<string, string> parameters = null,int priority = 0)
+            int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
-            var notification = CreateNotification(title, body, playSound, id, parameters,priority);
+            var notification = CreateNotification(title, body, playSound, id, parameters, priority);
 
             var intent = CreateAlarmHandlerIntent(context, id, notification);
             var milliseconds = ((DateTimeOffset)notifyTime).ToUnixTimeMilliseconds();
@@ -68,7 +69,7 @@
 
         static int GetUniqueId => (int)JavaSystem.CurrentTimeMillis() & 0xffffff;
 
-        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, int id, Dictionary<string, string> parameters,int priority = 0)
+        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, int id, Dictionary<string, string> parameters, int priority = 0)
         {
             return new AndroidLocalNotification
             {
