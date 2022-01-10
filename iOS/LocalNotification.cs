@@ -42,7 +42,7 @@
             }
         }
 
-        public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null)
+        public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
             if (!await Permission.LocalNotification.IsGranted())
             {

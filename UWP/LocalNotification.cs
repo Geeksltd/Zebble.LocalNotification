@@ -62,7 +62,7 @@
             return Task.FromResult(result: true);
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
             var param = GetParameters(title, body, id, notifyTime, parameters);
             var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
