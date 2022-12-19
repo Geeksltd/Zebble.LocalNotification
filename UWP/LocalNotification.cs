@@ -25,13 +25,13 @@
                                                   + "{2}"
                                                   + "</toast>";
 
-        static string GetParameters(string title, string body, int id, DateTime notifyDateTime, Dictionary<string, string> parameters)
+        static string GetParameters(string title, string body, string id, DateTime notifyDateTime, Dictionary<string, string> parameters)
         {
             void setDetail()
             {
                 parameters.Add(TITLE_KEY, title);
                 parameters.Add(BODY_KEY, body);
-                parameters.Add(ID_KEY, id.ToString());
+                parameters.Add(ID_KEY, id);
                 parameters.Add(DATETIME_KEY, notifyDateTime.ToString(FMT));
             }
 
@@ -47,7 +47,7 @@
 
         public static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var param = GetParameters(title, body, 0, DateTime.Now, parameters);
+            var param = GetParameters(title, body, "", DateTime.Now, parameters);
             var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
 
             var xmlDoc = new XmlDocument();
@@ -62,7 +62,7 @@
             return Task.FromResult(result: true);
         }
 
-        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
+        public static Task<bool> Schedule(string title, string body, DateTime notifyTime, string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
             var param = GetParameters(title, body, id, notifyTime, parameters);
             var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
@@ -74,18 +74,18 @@
               ? DateTime.Now.AddMilliseconds(100)
               : notifyTime;
 
-            var scheduledToastNotification = new ScheduledToastNotification(xmlDoc, new DateTimeOffset(correctedTime)) { Id = id.ToString() };
+            var scheduledToastNotification = new ScheduledToastNotification(xmlDoc, new DateTimeOffset(correctedTime)) { Id = id };
 
             ToastNotificationManager.CreateToastNotifier().AddToSchedule(scheduledToastNotification);
 
             return Task.FromResult(result: true);
         }
 
-        public static Task Cancel(int id)
+        public static Task Cancel(string id)
         {
             var scheduledNotifications = ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications();
             var notification =
-                scheduledNotifications.FirstOrDefault(n => n.Id.Equals(id.ToString(), StringComparison.OrdinalIgnoreCase));
+                scheduledNotifications.FirstOrDefault(n => n.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 
             if (notification != null)
                 ToastNotificationManager.CreateToastNotifier().RemoveFromSchedule(notification);

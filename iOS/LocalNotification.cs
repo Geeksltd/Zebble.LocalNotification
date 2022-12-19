@@ -17,7 +17,7 @@
         const string NOTIFICATION_BODY_KEY = "LocalNotificationBodyKey";
         const string NOTIFICATION_Date_KEY = "LocalNotificationDateKey";
 
-        public async static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             try
             {
@@ -30,10 +30,11 @@
                 if (OS.IsAtLeastiOS(10))
                 {
                     var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(.1, repeats: false);
-                    ShowUserNotification(title, body, 0, trigger, playSound, parameters);
+                    ShowUserNotification(title, body, "", trigger, playSound, parameters);
                     return true;
                 }
-                else return await Schedule(title, body, LocalTime.Now, 0, parameters: parameters);
+                
+                return await Schedule(title, body, LocalTime.Now, "", parameters: parameters);
             }
             catch (Exception ex)
             {
@@ -42,7 +43,7 @@
             }
         }
 
-        public async static Task<bool> Schedule(string title, string body, DateTime notifyTime, int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
+        public static async Task<bool> Schedule(string title, string body, DateTime notifyTime, string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
             if (!await Permission.LocalNotification.IsGranted())
             {
@@ -59,7 +60,7 @@
             else
             {
                 var userData = NSDictionary.FromObjectsAndKeys(
-                    new NSObject[] { id.ToString().ToNs(), parameters.DicToString().ToNs(), title.ToNs(), body.ToNs(), (NSDate)notifyTime },
+                    new NSObject[] { id.ToNs(), parameters.DicToString().ToNs(), title.ToNs(), body.ToNs(), (NSDate)notifyTime },
                     new NSObject[] { NOTIFICATION_KEY.ToNs(), NOTIFICATION_PARAM_KEY.ToNs(),
                     NOTIFICATION_TITLE_KEY.ToNs(), NOTIFICATION_BODY_KEY.ToNs(), NOTIFICATION_Date_KEY.ToNs() });
 
@@ -77,11 +78,11 @@
             return true;
         }
 
-        public static Task Cancel(int id)
+        public static Task Cancel(string id)
         {
             if (OS.IsAtLeastiOS(10))
             {
-                var ids = new string[] { id.ToString() };
+                var ids = new string[] { id };
                 UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
                 UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
             }
@@ -122,12 +123,12 @@
             Thread.UI.Run(() => UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0);
         }
 
-        static void ShowUserNotification(string title, string body, int id, UNNotificationTrigger trigger, bool playSound = false, Dictionary<string, string> parameters = null)
+        static void ShowUserNotification(string title, string body, string id, UNNotificationTrigger trigger, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             if (OS.IsBeforeiOS(10)) return;
 
             var userData = NSDictionary.FromObjectsAndKeys(
-                new NSObject[] { id.ToString().ToNs(), parameters.DicToString().ToNs(), title.ToNs(), body.ToNs(), NSDate.Now },
+                new NSObject[] { id.ToNs(), parameters.DicToString().ToNs(), title.ToNs(), body.ToNs(), NSDate.Now },
                 new NSObject[] { NOTIFICATION_KEY.ToNs(), NOTIFICATION_PARAM_KEY.ToNs(),
                     NOTIFICATION_TITLE_KEY.ToNs(), NOTIFICATION_BODY_KEY.ToNs(), NOTIFICATION_Date_KEY.ToNs() });
 
@@ -139,7 +140,7 @@
                 Sound = UNNotificationSound.Default
             };
 
-            var request = UNNotificationRequest.FromIdentifier(id.ToString(), content, trigger);
+            var request = UNNotificationRequest.FromIdentifier(id, content, trigger);
 
             UNUserNotificationCenter.Current.AddNotificationRequest(request, (error) => { });
         }
