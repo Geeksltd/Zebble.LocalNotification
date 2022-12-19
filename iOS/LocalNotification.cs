@@ -168,7 +168,7 @@
             {
                 if (param == null) return;
 
-                var id = Convert.ToInt32(param.ValueForKey(NOTIFICATION_KEY.ToNs()).ToObject().ToString());
+                var id = param.ValueForKey(NOTIFICATION_KEY.ToNs()).ToObject().ToString();
                 var title = param.ValueForKey(NOTIFICATION_TITLE_KEY.ToNs()).ToObject().ToString();
                 var body = param.ValueForKey(NOTIFICATION_BODY_KEY.ToNs()).ToObject().ToString();
                 var parameters = param.ValueForKey(NOTIFICATION_PARAM_KEY.ToNs()).ToObject().ToString().StringToDic();

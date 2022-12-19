@@ -103,7 +103,7 @@
                 {
                     Title = args[TITLE_KEY],
                     Body = args[BODY_KEY],
-                    Id = Convert.ToInt32(args[ID_KEY]),
+                    Id = args[ID_KEY],
                     NotifyTime = DateTime.ParseExact(args[DATETIME_KEY], FMT, System.Globalization.CultureInfo.InvariantCulture),
                     Parameters = args.Except(x => x.Key == TITLE_KEY || x.Key == BODY_KEY || x.Key == ID_KEY || x.Key == DATETIME_KEY)
                     .ToDictionary(x => x.Key, x => x.Value)

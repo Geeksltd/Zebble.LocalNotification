@@ -17,7 +17,7 @@
 
         public static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var notification = CreateNotification(title, body, playSound, 0, parameters);
+            var notification = CreateNotification(title, body, playSound, "", parameters);
 
             return Show(UIRuntime.CurrentActivity, notification);
         }
@@ -26,7 +26,7 @@
         {
             var native = notification.Render(context);
 
-            GetNotificationManager(context).Notify(notification.Id, native);
+            GetNotificationManager(context).Notify(notification.Id.GetHashCode(), native);
 
             EnsureScreenLightIsOn(context);
 
@@ -34,13 +34,13 @@
         }
 
         public static Task<bool> Schedule(
-            string title, string body, DateTime notifyTime, int id,
+            string title, string body, DateTime notifyTime, string id,
             bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0
         ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority);
 
         internal static Task<bool> Schedule(
             Android.Content.Context context, string title, string body, DateTime notifyTime,
-            int id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
+            string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
             var notification = CreateNotification(title, body, playSound, id, parameters, priority);
 
@@ -57,19 +57,19 @@
             return Task.FromResult(result: true);
         }
 
-        public static Task Cancel(int id) => Cancel(UIRuntime.CurrentActivity, id);
+        public static Task Cancel(string id) => Cancel(UIRuntime.CurrentActivity, id);
 
-        internal static Task Cancel(Android.Content.Context context, int id)
+        internal static Task Cancel(Android.Content.Context context, string id)
         {
             GetAlarmManager(context).Cancel(CreateAlarmHandlerIntent(context, id));
-            GetNotificationManager(context).Cancel(id);
+            GetNotificationManager(context).Cancel(id.GetHashCode());
 
             return Task.CompletedTask;
         }
 
         static int GetUniqueId => (int)JavaSystem.CurrentTimeMillis() & 0xffffff;
 
-        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, int id, Dictionary<string, string> parameters, int priority = 0)
+        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, string id, Dictionary<string, string> parameters, int priority = 0)
         {
             return new AndroidLocalNotification
             {
@@ -88,7 +88,7 @@
             };
         }
 
-        static PendingIntent CreateAlarmHandlerIntent(Android.Content.Context context, int id, AndroidLocalNotification notification = null)
+        static PendingIntent CreateAlarmHandlerIntent(Android.Content.Context context, string id, AndroidLocalNotification notification = null)
         {
             var result = new Intent(context, typeof(ScheduledNotificationsBroadcastReceiver))
                 .SetAction($"ScheduledNotification-{id}");
