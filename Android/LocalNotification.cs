@@ -15,22 +15,28 @@
         static PowerManager GetPowerManager(Android.Content.Context context) => PowerManager.FromContext(context);
         static AlarmManager GetAlarmManager(Android.Content.Context context) => AlarmManager.FromContext(context);
 
-        public static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             var notification = CreateNotification(title, body, playSound, "", parameters);
 
-            return Show(UIRuntime.CurrentActivity, notification);
+            return await Show(UIRuntime.CurrentActivity, notification);
         }
 
-        internal static Task<bool> Show(Android.Content.Context context, AndroidLocalNotification notification)
+        internal static async Task<bool> Show(Android.Content.Context context, AndroidLocalNotification notification)
         {
+            if (!await Permission.LocalNotification.IsGranted())
+            {
+                await Alert.Show("Permission was not granted to show local notifications.");
+                return false;
+            }
+
             var native = notification.Render(context);
 
             GetNotificationManager(context).Notify(notification.Id.GetHashCode(), native);
 
             EnsureScreenLightIsOn(context);
 
-            return Task.FromResult(result: true);
+            return true;
         }
 
         public static Task<bool> Schedule(
@@ -38,10 +44,16 @@
             bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0
         ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority);
 
-        internal static Task<bool> Schedule(
+        internal static async Task<bool> Schedule(
             Android.Content.Context context, string title, string body, DateTime notifyTime,
             string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
+            if (!await Permission.LocalNotification.IsGranted())
+            {
+                await Alert.Show("Permission was not granted to show local notifications.");
+                return false;
+            }
+
             var notification = CreateNotification(title, body, playSound, id, parameters, priority);
 
             var intent = CreateAlarmHandlerIntent(context, id, notification);
@@ -54,7 +66,7 @@
             else
                 alarmManager.SetExact(AlarmType.RtcWakeup, milliseconds, intent);
 
-            return Task.FromResult(result: true);
+            return true;
         }
 
         public static Task Cancel(string id) => Cancel(UIRuntime.CurrentActivity, id);
