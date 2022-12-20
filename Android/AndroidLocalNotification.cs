@@ -55,7 +55,7 @@
             var intent = context.PackageManager.GetLaunchIntentForPackage(context.PackageName);
             intent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
 
-            return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent);
+            return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
         }
     }
 }
