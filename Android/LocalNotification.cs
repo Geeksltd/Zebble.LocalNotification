@@ -24,7 +24,7 @@
 
         internal static async Task<bool> Show(Android.Content.Context context, AndroidLocalNotification notification)
         {
-            if (!await Permission.LocalNotification.IsGranted())
+            if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
                 await Alert.Show("Permission was not granted to show local notifications.");
                 return false;
@@ -48,7 +48,7 @@
             Android.Content.Context context, string title, string body, DateTime notifyTime,
             string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
-            if (!await Permission.LocalNotification.IsGranted())
+            if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
                 await Alert.Show("Permission was not granted to show local notifications.");
                 return false;

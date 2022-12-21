@@ -21,7 +21,7 @@
         {
             try
             {
-                if (!await Permission.LocalNotification.IsGranted())
+                if (await Permission.LocalNotification.IsRequestGranted() == false)
                 {
                     await Alert.Show("Permission was not granted to show local notifications.");
                     return false;
@@ -33,7 +33,7 @@
                     ShowUserNotification(title, body, "", trigger, playSound, parameters);
                     return true;
                 }
-                
+
                 return await Schedule(title, body, LocalTime.Now, "", parameters: parameters);
             }
             catch (Exception ex)
@@ -45,7 +45,7 @@
 
         public static async Task<bool> Schedule(string title, string body, DateTime notifyTime, string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
         {
-            if (!await Permission.LocalNotification.IsGranted())
+            if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
                 await Alert.Show("Permission was not granted to show local notifications.");
                 return false;
