@@ -9,6 +9,7 @@
     using Zebble.Device;
     using Olive;
     using System.Collections.Generic;
+    using Android.Content;
 
     class AndroidLocalNotification
     {
@@ -52,7 +53,7 @@
 
         PendingIntent CreateLaunchIntent(Context context)
         {
-            var intent = context.PackageManager.GetLaunchIntentForPackage(context.PackageName);
+            Intent intent = new Intent(context, UIRuntime.CurrentActivity.GetType());
             intent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
 
             return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
