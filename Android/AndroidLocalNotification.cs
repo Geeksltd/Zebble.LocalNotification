@@ -23,6 +23,7 @@
         public string TransparentIconColor { get; set; }
         public DateTime NotifyTime { get; set; } = DateTime.Now;
         public bool PlaySound { set; get; }
+        public bool IsAutoCancel { get; set; }
         public int Priority { set; get; }
         public Dictionary<string, string> Parameters { get; set; }
 
@@ -35,8 +36,8 @@
                 .SetCategory(Notification.CategoryMessage)
                 .SetContentIntent(CreateLaunchIntent(context))
                 .SetPriority(Priority)
+                .SetAutoCancel(IsAutoCancel)
                 .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
-
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));
 
