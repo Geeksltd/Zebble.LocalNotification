@@ -24,6 +24,12 @@
 
         internal static async Task<bool> Show(Android.Content.Context context, AndroidLocalNotification notification)
         {
+            if (await Permission.LocalNotification.IsRequestGranted() == false)
+            {
+                await Alert.Show("Permission was not granted to show local notifications.");
+                return false;
+            }
+
             var native = notification.Render(context);
 
             GetNotificationManager(context).Notify(notification.Id.GetHashCode(), native);
