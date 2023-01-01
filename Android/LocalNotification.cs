@@ -1,23 +1,23 @@
 ﻿namespace Zebble.Device
 {
     using Android.App;
+    using Android.Content;
+    using Android.OS;
     using Java.Lang;
+    using Newtonsoft.Json;
+    using Olive;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Olive;
-    using Android.Content;
-    using Newtonsoft.Json;
-    using Android.OS;
 
     public static partial class LocalNotification
     {
         static PowerManager GetPowerManager(Android.Content.Context context) => PowerManager.FromContext(context);
         static AlarmManager GetAlarmManager(Android.Content.Context context) => AlarmManager.FromContext(context);
 
-        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true)
         {
-            var notification = CreateNotification(title, body, playSound, "", parameters);
+            var notification = CreateNotification(title, body, playSound, "", parameters, 0, isAutoCancel);
 
             return await Show(UIRuntime.CurrentActivity, notification);
         }
@@ -41,12 +41,12 @@
 
         public static Task<bool> Schedule(
             string title, string body, DateTime notifyTime, string id,
-            bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0
-        ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority);
+            bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0, bool isAutoCancel = true
+        ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority, isAutoCancel);
 
         internal static async Task<bool> Schedule(
             Android.Content.Context context, string title, string body, DateTime notifyTime,
-            string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0)
+            string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0, bool isAutoCancel = true)
         {
             if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
@@ -54,7 +54,7 @@
                 return false;
             }
 
-            var notification = CreateNotification(title, body, playSound, id, parameters, priority);
+            var notification = CreateNotification(title, body, playSound, id, parameters, priority, isAutoCancel);
 
             var intent = CreateAlarmHandlerIntent(context, id, notification);
             var milliseconds = ((DateTimeOffset)notifyTime).ToUnixTimeMilliseconds();
@@ -81,7 +81,7 @@
 
         static int GetUniqueId => (int)JavaSystem.CurrentTimeMillis() & 0xffffff;
 
-        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, string id, Dictionary<string, string> parameters, int priority = 0)
+        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, string id, Dictionary<string, string> parameters, int priority = 0, bool isAutoCancel = true)
         {
             return new AndroidLocalNotification
             {
@@ -96,7 +96,8 @@
                 TransparentIconColor = TransparentIconColor.ToStringOrEmpty().Or("transparent"),
                 NotifyTime = DateTime.Now,
                 Priority = priority,
-                Parameters = parameters
+                Parameters = parameters,
+                IsAutoCancel = isAutoCancel
             };
         }
 
