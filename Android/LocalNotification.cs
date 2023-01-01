@@ -3,6 +3,7 @@
     using Android.App;
     using Android.Content;
     using Android.OS;
+    using Android.Runtime;
     using Java.Lang;
     using Newtonsoft.Json;
     using Olive;
@@ -10,6 +11,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    [Preserve]
     public static partial class LocalNotification
     {
         static PowerManager GetPowerManager(Android.Content.Context context) => PowerManager.FromContext(context);
