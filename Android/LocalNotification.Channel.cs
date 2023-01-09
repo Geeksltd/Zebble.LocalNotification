@@ -26,7 +26,7 @@
         {
             return new AudioAttributes.Builder()
                 .SetContentType(AudioContentType.Sonification)
-                .SetUsage(AudioUsageKind.Alarm)
+                .SetUsage(AudioUsageKind.Notification)
                 .Build();
         }
     }
