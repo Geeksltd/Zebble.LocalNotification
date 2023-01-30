@@ -10,6 +10,7 @@
     using Olive;
     using System.Collections.Generic;
     using Android.Content;
+    using Java.Lang;
 
     class AndroidLocalNotification
     {
@@ -25,19 +26,28 @@
         public bool PlaySound { set; get; }
         public bool IsAutoCancel { get; set; }
         public int Priority { set; get; }
+        public string LaunchActivityClassName { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
 
         public Notification Render(Context context)
         {
+            Class activityClass;
+
+            if (UIRuntime.CurrentActivity is not null)
+                activityClass = Class.FromType(UIRuntime.CurrentActivity.GetType());
+            else
+                activityClass = Class.ForName(LaunchActivityClassName);
+
             var builder = new NotificationCompat.Builder(context, ChannelId)
                 .SetContentTitle(Title)
                 .SetContentText(Body)
                 .SetVisibility((int)NotificationVisibility.Public)
                 .SetCategory(Notification.CategoryMessage)
-                .SetContentIntent(CreateLaunchIntent(context))
+                .SetContentIntent(CreateLaunchIntent(context, activityClass))
                 .SetPriority(Priority)
                 .SetAutoCancel(IsAutoCancel)
                 .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
+
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));
 
@@ -52,9 +62,9 @@
             return builder.Build();
         }
 
-        PendingIntent CreateLaunchIntent(Context context)
+        PendingIntent CreateLaunchIntent(Context context, Class activityClass)
         {
-            Intent intent = new Intent(context, UIRuntime.CurrentActivity.GetType());
+            Intent intent = new Intent(context, activityClass);
             intent.PutExtra(LocalNotification.LocalNotificationKey, JsonConvert.SerializeObject(this));
 
             return PendingIntent.GetActivity(context, IntentId, intent, PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);

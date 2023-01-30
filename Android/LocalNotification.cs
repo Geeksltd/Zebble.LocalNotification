@@ -97,6 +97,7 @@
                 NotifyTime = DateTime.Now,
                 Priority = priority,
                 Parameters = parameters,
+                LaunchActivityClassName = Class.FromType(UIRuntime.CurrentActivity.GetType()).CanonicalName,
                 IsAutoCancel = isAutoCancel
             };
         }
