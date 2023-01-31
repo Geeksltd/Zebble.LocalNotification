@@ -19,7 +19,9 @@
                 var notification = JsonConvert.DeserializeObject<AndroidLocalNotification>(extra);
                 if (notification is null) return;
 
-                LocalNotification.Show(context.ApplicationContext, notification);
+                if (UIRuntime.AppContext is null) UIRuntime.AppContext = context;
+
+                LocalNotification.Show(context, notification);
             }
             catch (Exception ex)
             {
