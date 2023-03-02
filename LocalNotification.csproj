@@ -1,12 +1,12 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
   <PropertyGroup>
-    <TargetFrameworks>Xamarin.iOS10;MonoAndroid90</TargetFrameworks>
+    <TargetFrameworks>Xamarin.iOS10;MonoAndroid13.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.18362</TargetFrameworks>
     <AssemblyName>Zebble.LocalNotification</AssemblyName>
     <RootNamespace>Zebble</RootNamespace>
     <PackageId>Zebble.LocalNotification</PackageId>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <Version>1.1.166.0</Version>
+    <Version>1.1.167.0</Version>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <DefineConstants>$(DefineConstants)</DefineConstants>
@@ -24,7 +24,7 @@
     <PackageReleaseNotes>Minor fixes</PackageReleaseNotes>
     <Owners>Geeks Ltd</Owners>
     <Authors>Geeks Ltd</Authors>
-    <Copyright>Geeks Ltd 2021, All rights reserved.</Copyright>
+    <Copyright>Geeks Ltd 2023, All rights reserved.</Copyright>
     <DisableExtraReferences>true</DisableExtraReferences>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <DefaultItemExcludes>$(DefaultItemExcludes);obj/**</DefaultItemExcludes>
@@ -54,7 +54,7 @@
     <Compile Include="UWP\**\*.cs" />
   </ItemGroup>
   <ItemGroup Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">
-    <PackageReference Include="Xamarin.AndroidX.LocalBroadcastManager" Version="1.0.0.6" />
+    <PackageReference Include="Xamarin.AndroidX.LocalBroadcastManager" Version="1.1.0.4" />
     <PackageReference Include="Xamarin.ShortcutBadger" Version="1.1.21" />
     <Compile Include="Android\**\*.cs" />
   </ItemGroup>
@@ -68,7 +68,7 @@
     <None Remove="Zebble-LicenseAgreement.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Zebble" Version="4.5.668" />
+    <PackageReference Include="Zebble" Version="4.5.673" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="iOS\" />
