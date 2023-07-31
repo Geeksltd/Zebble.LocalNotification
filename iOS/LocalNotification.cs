@@ -168,12 +168,13 @@
             void RaiseTapped()
             {
                 if (param == null) return;
+                if (param.LacksKey(NOTIFICATION_KEY.ToNs())) return;
 
-                var id = param.ValueForKey(NOTIFICATION_KEY.ToNs()).ToObject().ToString();
-                var title = param.ValueForKey(NOTIFICATION_TITLE_KEY.ToNs()).ToObject().ToString();
-                var body = param.ValueForKey(NOTIFICATION_BODY_KEY.ToNs()).ToObject().ToString();
-                var parameters = param.ValueForKey(NOTIFICATION_PARAM_KEY.ToNs()).ToObject().ToString().StringToDic();
-                var notifyTime = (DateTime)param.ValueForKey(NOTIFICATION_Date_KEY.ToNs()).ToObject(typeof(DateTime));
+                var id = param.ValueForKey(NOTIFICATION_KEY.ToNs())?.ToObject().ToString();
+                var title = param.ValueForKey(NOTIFICATION_TITLE_KEY.ToNs())?.ToObject().ToString();
+                var body = param.ValueForKey(NOTIFICATION_BODY_KEY.ToNs())?.ToObject().ToString();
+                var parameters = param.ValueForKey(NOTIFICATION_PARAM_KEY.ToNs())?.ToObject().ToString().StringToDic();
+                var notifyTime = (DateTime)param.ValueForKey(NOTIFICATION_Date_KEY.ToNs())?.ToObject(typeof(DateTime));
 
                 onTapped?.Invoke(new Notification
                 {
