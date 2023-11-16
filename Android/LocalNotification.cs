@@ -31,7 +31,7 @@ namespace Zebble.Device
         {
             if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
-                await Alert.Show("Permission was not granted to show local notifications.");
+                await Dialogs.Current.Alert("Permission was not granted to show local notifications.");
                 return false;
             }
 
@@ -55,7 +55,7 @@ namespace Zebble.Device
         {
             if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
-                await Alert.Show("Permission was not granted to show local notifications.");
+                await Dialogs.Current.Alert("Permission was not granted to show local notifications.");
                 return false;
             }
 
