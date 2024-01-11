@@ -1,9 +1,4 @@
-﻿using Android;
-using Android.App;
-
-[assembly: UsesPermission(Manifest.Permission.ScheduleExactAlarm)]
-
-namespace Zebble.Device
+﻿namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
@@ -67,9 +62,9 @@ namespace Zebble.Device
             var alarmManager = GetAlarmManager(context);
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
-                alarmManager.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, milliseconds, intent);
+                alarmManager.SetAndAllowWhileIdle(AlarmType.RtcWakeup, milliseconds, intent);
             else
-                alarmManager.SetExact(AlarmType.RtcWakeup, milliseconds, intent);
+                alarmManager.Set(AlarmType.RtcWakeup, milliseconds, intent);
 
             return true;
         }
