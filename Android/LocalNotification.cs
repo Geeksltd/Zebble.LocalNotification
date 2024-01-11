@@ -1,4 +1,9 @@
-﻿namespace Zebble.Device
+﻿﻿using Android;
+using Android.App;
+
+[assembly: UsesPermission(Manifest.Permission.ReceiveBootCompleted)]
+
+namespace Zebble.Device
 {
     using Android.App;
     using Android.Content;
