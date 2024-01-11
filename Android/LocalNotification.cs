@@ -15,9 +15,9 @@
         static PowerManager GetPowerManager(Android.Content.Context context) => PowerManager.FromContext(context);
         static AlarmManager GetAlarmManager(Android.Content.Context context) => AlarmManager.FromContext(context);
 
-        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true)
+        public static async Task<bool> Show(string title, string body, string id, bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true)
         {
-            var notification = CreateNotification(title, body, playSound, "", parameters, 0, isAutoCancel);
+            var notification = CreateNotification(title, body, id, playSound, parameters, 0, isAutoCancel);
 
             return await Show(UIRuntime.CurrentActivity, notification);
         }
@@ -54,7 +54,7 @@
                 return false;
             }
 
-            var notification = CreateNotification(title, body, playSound, id, parameters, priority, isAutoCancel);
+            var notification = CreateNotification(title, body, id, playSound, parameters, priority, isAutoCancel);
 
             var intent = CreateAlarmHandlerIntent(context, id, notification);
             var milliseconds = ((DateTimeOffset)notifyTime).ToUnixTimeMilliseconds();
@@ -81,14 +81,14 @@
 
         static int GetUniqueId => (int)JavaSystem.CurrentTimeMillis() & 0xffffff;
 
-        static AndroidLocalNotification CreateNotification(string title, string body, bool playSound, string id, Dictionary<string, string> parameters, int priority = 0, bool isAutoCancel = true)
+        static AndroidLocalNotification CreateNotification(string title, string body, string id, bool playSound, Dictionary<string, string> parameters, int priority = 0, bool isAutoCancel = true)
         {
             return new AndroidLocalNotification
             {
                 Title = title,
                 Body = body,
-                PlaySound = playSound,
                 Id = id,
+                PlaySound = playSound,
                 IntentId = GetUniqueId,
                 ChannelId = CurrentChannel?.Id,
                 Icon = Icon,
