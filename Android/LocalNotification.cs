@@ -1,7 +1,7 @@
-﻿﻿using Android;
+﻿using Android;
 using Android.App;
 
-[assembly: UsesPermission(Manifest.Permission.ReceiveBootCompleted)]
+[assembly: UsesPermission(Manifest.Permission.PostNotifications)]
 
 namespace Zebble.Device
 {
