@@ -45,9 +45,9 @@
             return $"launch=\"{parameters.DicToString()}\"";
         }
 
-        public static Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static Task<bool> Show(string title, string body, string id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
-            var param = GetParameters(title, body, "", DateTime.Now, parameters);
+            var param = GetParameters(title, body, id, DateTime.Now, parameters);
             var xmlData = string.Format(TOAST_TEMPLATE, title, body, playSound ? "<audio src='ms-winsoundevent:Notification.Reminder'/>" : string.Empty, param);
 
             var xmlDoc = new XmlDocument();
