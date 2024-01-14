@@ -17,7 +17,7 @@
         const string NOTIFICATION_BODY_KEY = "LocalNotificationBodyKey";
         const string NOTIFICATION_Date_KEY = "LocalNotificationDateKey";
 
-        public static async Task<bool> Show(string title, string body, bool playSound = false, Dictionary<string, string> parameters = null)
+        public static async Task<bool> Show(string title, string body, string id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             try
             {
@@ -30,7 +30,7 @@
                 if (OS.IsAtLeastiOS(10))
                 {
                     var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(.1, repeats: false);
-                    ShowUserNotification(title, body, "", trigger, playSound, parameters);
+                    ShowUserNotification(title, body, id, trigger, playSound, parameters);
                     return true;
                 }
 
