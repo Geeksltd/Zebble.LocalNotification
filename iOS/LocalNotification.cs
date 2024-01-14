@@ -16,7 +16,7 @@
         const string NOTIFICATION_TITLE_KEY = "LocalNotificationTitleKey";
         const string NOTIFICATION_BODY_KEY = "LocalNotificationBodyKey";
         const string NOTIFICATION_Date_KEY = "LocalNotificationDateKey";
-
+        
         public static async Task<bool> Show(string title, string body, string id, bool playSound = false, Dictionary<string, string> parameters = null)
         {
             try
@@ -34,7 +34,7 @@
                     return true;
                 }
 
-                return await Schedule(title, body, LocalTime.Now, "", parameters: parameters);
+                return await Schedule(title, body, LocalTime.Now, id, parameters: parameters);
             }
             catch (Exception ex)
             {
