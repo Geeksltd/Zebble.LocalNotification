@@ -3,7 +3,6 @@
     using Android.App;
     using Context = Android.Content.Context;
     using Android.OS;
-    using AndroidX.Core.App;
     using Newtonsoft.Json;
     using System;
     using Zebble.Device;
@@ -38,15 +37,26 @@
             else
                 activityClass = Class.ForName(LaunchActivityClassName);
 
-            var builder = new NotificationCompat.Builder(context, ChannelId)
+#if MONOANDROID
+            var builder = new AndroidX.Core.App.NotificationCompat.Builder(context, ChannelId);
+#else
+            var builder = new Notification.Builder(context, ChannelId);
+#endif
+
+            builder
                 .SetContentTitle(Title)
                 .SetContentText(Body)
-                .SetVisibility((int)NotificationVisibility.Public)
                 .SetCategory(Notification.CategoryMessage)
                 .SetContentIntent(CreateLaunchIntent(context, activityClass))
                 .SetPriority(Priority)
                 .SetAutoCancel(IsAutoCancel)
                 .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
+
+#if MONOANDROID
+            builder.SetVisibility((int)NotificationVisibility.Public);
+#else
+            builder.SetVisibility(NotificationVisibility.Public);
+#endif
 
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));
