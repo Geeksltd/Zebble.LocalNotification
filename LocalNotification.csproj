@@ -6,7 +6,7 @@
     <RootNamespace>Zebble</RootNamespace>
     <PackageId>Zebble.LocalNotification</PackageId>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <Version>2.0.1.0</Version>
+    <Version>2.0.2.0</Version>
     <PackOnBuild>true</PackOnBuild>
     <NeutralLanguage>en</NeutralLanguage>
     <DefineConstants>$(DefineConstants)</DefineConstants>
@@ -54,13 +54,7 @@
     <Compile Include="UWP\**\*.cs" />
   </ItemGroup>
   <ItemGroup Condition=" $(DefineConstants.Contains('ANDROID')) ">
-    <PackageReference Include="Xamarin.AndroidX.LocalBroadcastManager" Version="1.1.0.14" />
     <Compile Include="Android\**\*.cs" />
-  </ItemGroup>
-  <ItemGroup Condition=" $(TargetFramework.Contains('MonoAndroid13')) ">
-    <PackageReference Include="Xamarin.ShortcutBadger" Version="1.1.21" />
-  </ItemGroup>
-  <ItemGroup Condition=" $(TargetFramework.Contains('-android')) ">
     <PackageReference Include="Xamarin.ShortcutBadger" Version="1.1.22.80" />
   </ItemGroup>
   <ItemGroup Condition=" $(DefineConstants.Contains('IOS')) ">
