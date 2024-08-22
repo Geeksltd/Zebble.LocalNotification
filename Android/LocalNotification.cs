@@ -22,7 +22,7 @@ namespace Zebble.Device
 
         public static async Task<bool> Show(string title, string body, string id, bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true)
         {
-            var notification = CreateNotification(title, body, id, playSound, parameters, 0, isAutoCancel);
+            var notification = CreateNotification(title, body, id, playSound, parameters, isAutoCancel);
 
             return await Show(UIRuntime.CurrentActivity, notification);
         }
@@ -46,12 +46,12 @@ namespace Zebble.Device
 
         public static Task<bool> Schedule(
             string title, string body, DateTime notifyTime, string id,
-            bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0, bool isAutoCancel = true
-        ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, priority, isAutoCancel);
+            bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true
+        ) => Schedule(UIRuntime.CurrentActivity, title, body, notifyTime, id, playSound, parameters, isAutoCancel);
 
         internal static async Task<bool> Schedule(
             Android.Content.Context context, string title, string body, DateTime notifyTime,
-            string id, bool playSound = false, Dictionary<string, string> parameters = null, int priority = 0, bool isAutoCancel = true)
+            string id, bool playSound = false, Dictionary<string, string> parameters = null, bool isAutoCancel = true)
         {
             if (await Permission.LocalNotification.IsRequestGranted() == false)
             {
@@ -59,7 +59,7 @@ namespace Zebble.Device
                 return false;
             }
 
-            var notification = CreateNotification(title, body, id, playSound, parameters, priority, isAutoCancel);
+            var notification = CreateNotification(title, body, id, playSound, parameters, isAutoCancel);
 
             var intent = CreateAlarmHandlerIntent(context, id, notification);
             var milliseconds = ((DateTimeOffset)notifyTime).ToUnixTimeMilliseconds();
@@ -86,7 +86,7 @@ namespace Zebble.Device
 
         static int GetUniqueId => (int)JavaSystem.CurrentTimeMillis() & 0xffffff;
 
-        static AndroidLocalNotification CreateNotification(string title, string body, string id, bool playSound, Dictionary<string, string> parameters, int priority = 0, bool isAutoCancel = true)
+        static AndroidLocalNotification CreateNotification(string title, string body, string id, bool playSound, Dictionary<string, string> parameters, bool isAutoCancel = true)
         {
             return new AndroidLocalNotification
             {
@@ -100,7 +100,6 @@ namespace Zebble.Device
                 TransparentIcon = TransparentIcon,
                 TransparentIconColor = TransparentIconColor.ToStringOrEmpty().Or("transparent"),
                 NotifyTime = DateTime.Now,
-                Priority = priority,
                 Parameters = parameters,
                 LaunchActivityClassName = Class.FromType(UIRuntime.CurrentActivity.GetType()).CanonicalName,
                 IsAutoCancel = isAutoCancel
@@ -115,7 +114,7 @@ namespace Zebble.Device
             if (notification is not null)
                 result.PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
 
-            return result.ToPendingBroadcast(context);
+            return result.ToPendingBroadcast(context, notification.Id.GetHashCode());
         }
 
         static void EnsureScreenLightIsOn(Android.Content.Context context)

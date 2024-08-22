@@ -24,7 +24,6 @@
         public DateTime NotifyTime { get; set; } = DateTime.Now;
         public bool PlaySound { set; get; }
         public bool IsAutoCancel { get; set; }
-        public int Priority { set; get; }
         public string LaunchActivityClassName { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
 
@@ -37,26 +36,16 @@
             else
                 activityClass = Class.ForName(LaunchActivityClassName);
 
-#if MONOANDROID
-            var builder = new AndroidX.Core.App.NotificationCompat.Builder(context, ChannelId);
-#else
             var builder = new Notification.Builder(context, ChannelId);
-#endif
 
             builder
                 .SetContentTitle(Title)
                 .SetContentText(Body)
-                .SetCategory(Notification.CategoryMessage)
+                .SetCategory(Notification.CategoryReminder)
                 .SetContentIntent(CreateLaunchIntent(context, activityClass))
-                .SetPriority(Priority)
                 .SetAutoCancel(IsAutoCancel)
-                .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds());
-
-#if MONOANDROID
-            builder.SetVisibility((int)NotificationVisibility.Public);
-#else
-            builder.SetVisibility(NotificationVisibility.Public);
-#endif
+                .SetWhen(new DateTimeOffset(NotifyTime).ToUnixTimeMilliseconds())
+                .SetVisibility(NotificationVisibility.Public);
 
             if (Icon?.Name.HasValue() == true)
                 builder.SetSmallIcon(Icon.ConvertToId(context));

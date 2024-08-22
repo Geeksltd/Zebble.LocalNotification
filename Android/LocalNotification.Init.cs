@@ -28,29 +28,9 @@
             TransparentIconColor = transparentIconColor;
             OnTapped = onTapped;
 
-            RegisterScheduledNotificationBroadcastReceiver();
-
             if (OS.IsAtLeast(BuildVersionCodes.O)) CreateChannel(name, description, sound, importance);
 
             if (onTapped is not null) UIRuntime.OnNewIntent.Handle(OnNewIntent);
-        }
-
-        static void RegisterScheduledNotificationBroadcastReceiver()
-        {
-            var receiver = new ScheduledNotificationsBroadcastReceiver();
-
-            var filter = new IntentFilter { Priority = 100 };
-            filter.AddAction(Intent.ActionScreenOn);
-            filter.AddAction(Intent.ActionScreenOff);
-            filter.AddAction(Intent.ActionBootCompleted);
-
-            UIRuntime.CurrentActivity.RegisterReceiver(receiver, filter);
-
-            App.Stopping += () =>
-            {
-                try { UIRuntime.CurrentActivity.UnregisterReceiver(receiver); }
-                catch { }
-            };
         }
 
         static void OnNewIntent(Intent intent)
