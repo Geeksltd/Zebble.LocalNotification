@@ -114,7 +114,7 @@ namespace Zebble.Device
             if (notification is not null)
                 result.PutExtra(LocalNotificationKey, JsonConvert.SerializeObject(notification));
 
-            return result.ToPendingBroadcast(context, notification.Id.GetHashCode());
+            return result.ToPendingBroadcast(context, id.GetHashCode());
         }
 
         static void EnsureScreenLightIsOn(Android.Content.Context context)
